@@ -33,38 +33,84 @@
     }
 
     Triangle.prototype.makeBase = function() {
-      var a, i, _i, _results;
+      var a;
 
       this.base = new Path([[view.center.x + 0, view.center.y + 10], [view.center.x + 10, view.center.y + 40], [view.center.x + 60, view.center.y + 40]]);
       this.base.fillColor = '#f1f1f1';
       this.base.closed = true;
-      a = this.addTriangle(this.base);
-      _results = [];
-      for (i = _i = 0; _i <= 1500; i = ++_i) {
-        _results.push(a = this.addTriangle(a));
-      }
-      return _results;
+      this.base.sides = [
+        {
+          isFree: true
+        }, {
+          isFree: true
+        }, {
+          isFree: true
+        }
+      ];
+      return a = this.addTriangle(this.base);
     };
 
     Triangle.prototype.addTriangle = function(path) {
-      var base, nextColor, _ref;
+      var a, b, base, c, isFoundSide, len, point1, point2, point3, side, vector1, vector2;
 
       base = new Path;
-      base.add(new Point({
-        x: path.segments[1].point.x + h.getRand(-50, 50),
-        y: path.segments[1].point.y + h.getRand(-50, 50)
-      }));
-      base.segments[1] = path.segments[0];
-      base.segments[2] = path.segments[1];
-      if ((_ref = this.color) == null) {
-        this.color = h.getRand(150, 175);
+      base.sides = [
+        {
+          isFree: true
+        }, {
+          isFree: true
+        }, {
+          isFree: true
+        }
+      ];
+      isFoundSide = false;
+      side = -1;
+      if (path.sides[0].isFree && !isFoundSide) {
+        base.segments[0] = path.segments[0];
+        base.segments[1] = path.segments[1];
+        base.sides[0].isFree = false;
+        path.sides[0].isFree = false;
+        side = 0;
+        isFoundSide = true;
       }
-      nextColor = this.color - (h.getRand(-10, 10));
-      base.fillColor = "rgb(" + nextColor + "," + nextColor + "," + nextColor + ")";
-      this.color = nextColor;
-      base.closed = true;
+      if (path.sides[1].isFree && !isFoundSide) {
+        base.segments[0] = path.segments[1];
+        base.segments[1] = path.segments[2];
+        base.sides[0].isFree = false;
+        path.sides[1].isFree = false;
+        side = 2;
+        isFoundSide = true;
+      }
+      if (path.sides[2].isFree && !isFoundSide) {
+        base.segments[0] = path.segments[2];
+        base.segments[1] = path.segments[3];
+        base.sides[0].isFree = false;
+        path.sides[2].isFree = false;
+        side = 3;
+        isFoundSide = true;
+      }
+      switch (side) {
+        case 0:
+          vector1 = path.segments[1].point - path.segments[2].point;
+          vector2 = path.segments[0].point - path.segments[2].point;
+          len = h.getRand(20, 80);
+          vector1.length += len;
+          vector2.length += len;
+          point1 = path.segments[1].point + vector1;
+          point2 = path.segments[0].point + vector2;
+          a = new Path.Rectangle(point1, [10, 10]);
+          a.fillColor = 'black';
+          b = new Path.Rectangle(point2, [10, 10]);
+          b.fillColor = 'black';
+          point3 = {
+            x: ((point1.x + path.segments[1].point.x) / 2) + h.getRand(-5, -len / 2),
+            y: ((point1.y + point2.y) / 2) + h.getRand(-5, len / 2)
+          };
+          c = new Path.Rectangle(point3, [10, 10]);
+          c.fillColor = 'orange';
+      }
+      console.log(base);
       this.trias.push(base);
-      this.animate(base);
       return base;
     };
 
