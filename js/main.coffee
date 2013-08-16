@@ -19,146 +19,64 @@ h =
 
 view.setViewSize $(window).outerWidth(), $(window).outerHeight()
 
-class Triangle
-	constructor:->
-		@trias = []
 
+console.log TWEEN.Easing
+console.log TWEEN.Easing.Elastic.Out
+
+
+class String
+	constructor:->
 		@makeBase()
 
 	makeBase:->
-		@base = new Path [
-						[view.center.x+0,view.center.y+10],
-						[view.center.x+10,view.center.y+40]
-						[view.center.x+60,view.center.y+40]
-					]
-		@base.fillColor = '#f1f1f1'
-		@base.closed = true
-
-		@base.sides = [
-				{
-					isFree:true
-				},
-
-				{
-					isFree:true
-				},
-
-				{
-					isFree:true
-				}
-			]
-
-		a = @addTriangle @base		
-		# for i in [0..1500]
-		# 	a = @addTriangle a
-
+		@base = new Path
 		
+		@base.add [200,-5]
+		@base.add [200,view.viewSize.height+5]
 
-	addTriangle:(path)->
-		base = new Path
-		base.sides = [
-				{
-					isFree:true
-				},
+		@base.strokeColor = 'black'
+		@base.strokeWidth = 4
 
-				{
-					isFree:true
-				},
+	change:(point)->
+		if point.x > 500 or point.x < 0 then return
 
-				{
-					isFree:true
-				}
-			]
-
-		isFoundSide = false
-
-		side = -1
-		if path.sides[0].isFree and !isFoundSide
-			base.segments[0] = path.segments[0]
-			base.segments[1] = path.segments[1]
-			base.sides[0].isFree = false
-			path.sides[0].isFree = false
-			side = 0
-			isFoundSide = true
-
-		if path.sides[1].isFree and !isFoundSide
-			base.segments[0] = path.segments[1]
-			base.segments[1] = path.segments[2]
-			base.sides[0].isFree = false
-			path.sides[1].isFree = false
-			side = 2
-			isFoundSide = true
-
-		if path.sides[2].isFree and !isFoundSide
-			base.segments[0] = path.segments[2]
-			base.segments[1] = path.segments[3]
-			base.sides[0].isFree = false
-			path.sides[2].isFree = false
-			side = 3
-			isFoundSide = true
-
-		# find direction of 3rd point
-		
-		switch side
-			when 0
-				vector1 = path.segments[1].point - path.segments[2].point
-				vector2 = path.segments[0].point - path.segments[2].point
-				
-				len = h.getRand 20,80
-				vector1.length += len
-				vector2.length += len
-				point1 = path.segments[1].point + vector1
-				point2 = path.segments[0].point + vector2
-
-				a = new Path.Rectangle point1, [10,10]
-				a.fillColor  = 'black'
-
-				b = new Path.Rectangle point2, [10,10]
-				b.fillColor  = 'black'
-
-				point3 = 
-					x: ((point1.x + path.segments[1].point.x)/2)+h.getRand -5,-len/2
-					y: ((point1.y + point2.y)/2)+h.getRand -5,len/2
-
-				c = new Path.Rectangle point3, [10,10]
-				c.fillColor  = 'orange'
-
-
-		console.log base
-
-
-		# base.add new Point 
-		# 			x: path.segments[0].point.x + h.getRand -50, 50
-		# 			y: path.segments[0].point.y + h.getRand -50, 50
-
-		# base.closed = true
-		
-
-		# @color ?= h.getRand(150,175)
-		# nextColor  = @color - (h.getRand -10,10)
-		# base.fillColor = "rgb(#{nextColor},#{nextColor},#{nextColor})"
-		# @color = nextColor
-
-		# path.segments[1].point.y += 20
-
-		@trias.push base
-
-		# @animate base
-		
-		base
+		@base.segments[0].handleOut.y = point.y
+		@base.segments[0].handleOut.x = point.x - 200
 
 	animate:->
+		from = 
+			x: @base.segments[0].handleOut.x
+			y: @base.segments[0].handleOut.y
+		to = 
+			x: 0
+			y: 0
 
+		tw = new TWEEN.Tween(from).to(to, 500)
+		tw.easing (a)->
+			b = Math.sin( a)
+			console.log b
+			b
 
-	
-	update:(e)->
-		TWEEN.update()
+		it = @
+		tw.onUpdate ->
+			it.base.segments[0].handleOut.x = @x
+			it.base.segments[0].handleOut.y = @y
 
+		tw.start()
 
-triangle = new Triangle
+string = new String
 
 onFrame = (e)->
-	triangle.update()
+	TWEEN.update()
+
+
+onMouseDrag = (e)->
+	string.change e.point
+
+onMouseUp = (e)->
+	string.animate()
+
+
 
 
 
