@@ -48,11 +48,10 @@ String = (function() {
 
   String.prototype.makeBase = function() {
     this.base = new Path;
-    this.base.add(this.o.start);
-    this.base.add([this.o.start.x, this.o.start.y + this.o.length]);
+    this.base.add([this.o.offset, -this.o.width]);
+    this.base.add([this.o.offset, view.viewSize.height + this.o.width]);
     this.base.strokeColor = this.defaultColor;
-    this.base.strokeWidth = this.o.width;
-    return console.log(this.base);
+    return this.base.strokeWidth = this.o.width;
   };
 
   String.prototype.change = function(e) {
@@ -175,65 +174,17 @@ Strings = (function() {
     this.initialOffset = 100;
     this.strings = [];
     this.stringWidth = 10;
-    this.lenCoef = 0;
+    this.makeStrings();
     this.guitarShape = [
       {
-        start: new Point([this.initialOffset, 656]),
-        length: 22 + this.lenCoef
+        start: new Point([672, this.initialOffset]),
+        length: 10
       }, {
-        start: new Point([this.initialOffset + 1 * this.stringWidth * 1.5, 613]),
-        length: 38 + this.lenCoef
-      }, {
-        start: new Point([this.initialOffset + 2 * this.stringWidth * 1.5, 570]),
-        length: 60 + this.lenCoef
-      }, {
-        start: new Point([this.initialOffset + 3 * this.stringWidth * 1.5, 518]),
-        length: 90 + this.lenCoef
-      }, {
-        start: new Point([this.initialOffset + 4 * this.stringWidth * 1.5, 470]),
-        length: 118 + this.lenCoef
-      }, {
-        start: new Point([this.initialOffset + 5 * this.stringWidth * 1.5, 417]),
-        length: 153 + this.lenCoef
-      }, {
-        start: new Point([this.initialOffset + 6 * this.stringWidth * 1.5, 367]),
-        length: 188 + this.lenCoef
-      }, {
-        start: new Point([this.initialOffset + 7 * this.stringWidth * 1.5, 52]),
-        length: 486
-      }, {
-        start: new Point([this.initialOffset + 8 * this.stringWidth * 1.5, 34]),
-        length: 496 + this.lenCoef
-      }, {
-        start: new Point([this.initialOffset + 9 * this.stringWidth * 1.5, 332]),
-        length: 190 + this.lenCoef
-      }, {
-        start: new Point([this.initialOffset + 10 * this.stringWidth * 1.5, 348]),
-        length: 177 + this.lenCoef
-      }, {
-        start: new Point([this.initialOffset + 11 * this.stringWidth * 1.5, 372]),
-        length: 156 + this.lenCoef
-      }, {
-        start: new Point([this.initialOffset + 12 * this.stringWidth * 1.5, 396]),
-        length: 140 + this.lenCoef
-      }, {
-        start: new Point([this.initialOffset + 13 * this.stringWidth * 1.5, 432]),
-        length: 110 + this.lenCoef
-      }, {
-        start: new Point([this.initialOffset + 14 * this.stringWidth * 1.5, 472]),
-        length: 84 + this.lenCoef
-      }, {
-        start: new Point([this.initialOffset + 15 * this.stringWidth * 1.5, 510]),
-        length: 60 + this.lenCoef
-      }, {
-        start: new Point([this.initialOffset + 16 * this.stringWidth * 1.5, 534]),
-        length: 42 + this.lenCoef
-      }, {
-        start: new Point([this.initialOffset + 17 * this.stringWidth * 1.5, 570]),
-        length: 22 + this.lenCoef
+        start: new Point([672, this.initialOffset + this.stringWidth * 1.5]),
+        length: 10
       }
     ];
-    this.makeStrings();
+    console.log(this.guitarShape);
     this.makebase();
   }
 
@@ -248,17 +199,16 @@ Strings = (function() {
   };
 
   Strings.prototype.makeStrings = function(cnt) {
-    var i, string, _i, _ref, _results;
+    var i, string, _i, _results;
 
     if (cnt == null) {
       cnt = 15;
     }
     _results = [];
-    for (i = _i = 0, _ref = this.guitarShape.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+    for (i = _i = 0; 0 <= cnt ? _i < cnt : _i > cnt; i = 0 <= cnt ? ++_i : --_i) {
       string = new String({
-        width: this.stringWidth,
-        start: this.guitarShape[i].start,
-        length: this.guitarShape[i].length
+        offset: this.initialOffset + (i * this.stringWidth * 1.5),
+        width: this.stringWidth
       });
       string.index = i;
       _results.push(this.strings.push(string));
