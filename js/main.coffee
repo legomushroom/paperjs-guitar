@@ -141,25 +141,97 @@ class Strings
 		@initialOffset = 100
 		@strings = []
 		@stringWidth = 10
-		@guitarStart = 
+
+		@lenCoef = 0
 
 		@guitarShape = [
 					{
 						start: new Point [@initialOffset, 656]
-						length: 22
+						length: 22 + @lenCoef
 					}
 					{
 						start: new Point [@initialOffset + 1*@stringWidth*1.5, 613]
-						length: 38
+						length: 38 + @lenCoef
 					}
 					{
 						start: new Point [@initialOffset + 2*@stringWidth*1.5, 570]
-						length: 60
+						length: 60 + @lenCoef
 					}
 					{
-						start: new Point [@initialOffset + 3*@stringWidth*1.5, 530]
-						length: 85
+						start: new Point [@initialOffset + 3*@stringWidth*1.5, 518]
+						length: 90 + @lenCoef
 					}
+					{
+						start: new Point [@initialOffset + 4*@stringWidth*1.5, 470]
+						length: 118 + @lenCoef
+					}
+
+					{
+						start: new Point [@initialOffset + 5*@stringWidth*1.5, 417]
+						length: 153 + @lenCoef
+					}
+
+					{
+						start: new Point [@initialOffset + 6*@stringWidth*1.5, 367]
+						length: 188 + @lenCoef
+					}
+
+					{
+						start: new Point [@initialOffset + 7*@stringWidth*1.5, 52]
+						length: 486
+					}
+
+					{
+						start: new Point [@initialOffset + 8*@stringWidth*1.5, 34]
+						length: 496 + @lenCoef
+					}
+
+					{
+						start: new Point [@initialOffset + 9*@stringWidth*1.5, 332]
+						length: 190 + @lenCoef
+					}
+
+					{
+						start: new Point [@initialOffset + 10*@stringWidth*1.5, 348]
+						length: 177 + @lenCoef
+					}
+
+					{
+						start: new Point [@initialOffset + 11*@stringWidth*1.5, 372]
+						length: 156 + @lenCoef	
+					}
+
+					{
+						start: new Point [@initialOffset + 12*@stringWidth*1.5, 396]
+						length: 140 + @lenCoef
+					}
+
+					{
+						start: new Point [@initialOffset + 13*@stringWidth*1.5, 432]
+						length: 110 + @lenCoef
+					}
+
+					{
+						start: new Point [@initialOffset + 14*@stringWidth*1.5, 472]
+						length: 84 + @lenCoef
+					}
+
+					{
+						start: new Point [@initialOffset + 15*@stringWidth*1.5, 510]
+						length: 60 + @lenCoef
+					}
+
+					{
+						start: new Point [@initialOffset + 16*@stringWidth*1.5, 534]
+						length: 42 + @lenCoef
+					}
+
+					{
+						start: new Point [@initialOffset + 17*@stringWidth*1.5, 570]
+						length: 22 + @lenCoef
+					}
+
+
 				]
 
 		@makeStrings()

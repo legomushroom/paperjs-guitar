@@ -12,6 +12,9 @@ html {
   overflow: hidden;
   font-family: monospace;
 }
+.canvas-e {
+  background-color: #000;
+}
 .guitar-image-e {
   position: absolute;
   display: none;
