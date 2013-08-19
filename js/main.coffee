@@ -25,12 +25,40 @@ mouseDrag = null
 class String
 	constructor:(o)->
 		@o = o
-		@o.stringsOffset ?=  @o.width*15
+		@o.stringsOffset ?=  @o.width*20
 		@touched = false
 		@anima = false
 		@colors = ["#69D2E7", "#A7DBD8", "#E0E4CC", "#F38630", "#FA6900", "#C02942", "#542437", "#53777A", "#ECD078", "#FE4365"]
-		@defaultColor = "#333"
+		@defaultColor = "#222"
+		@makeOsc()
+
 		@makeBase()
+
+	makeOsc:->
+		@oscillator = @o.context.createOscillator() 
+		@gainNode = @o.context.createGainNode()
+		@gainNode.gain.value = 0.01
+		@oscillator.connect @gainNode
+		# @oscillator.type = 3
+		@gainNode.connect @o.context.destination
+
+
+		curveLength = 100;
+		curve1 = new Float32Array(curveLength);
+		curve2 = new Float32Array(curveLength);
+		curve3 = new Float32Array(curveLength);
+
+		for i in [0...curveLength]
+			curve1[i] = Math.cos(Math.PI*i/(curveLength))*222
+
+		for i in [0...curveLength]
+			curve2[i] = Math.sin(Math.PI*i/(curveLength))*222
+
+		for i in [0...curveLength]
+			curve3[i] = Math.exp(Math.PI*i/(curveLength))
+
+		waveTable = @o.context.createWaveTable( curve1, curve2, curve3)
+		@oscillator.setWaveTable(waveTable)
 
 	makeBase:->
 		@base = new Path
@@ -55,7 +83,7 @@ class String
 		if !@touched then return
 
 		if (point.x > (@o.offset + @o.stringsOffset)) or (point.x <( @o.offset - @o.stringsOffset ))
-			
+			@animate()
 			return
 
 		if @anima then return
@@ -67,6 +95,8 @@ class String
 	animate:->
 		@touched = false
 		if @anima then return
+		@anima = true
+
 		if @base.segments[0].handleOut.x is 0 then return
 
 		@soundX = parseInt Math.abs @base.segments[0].handleOut.x
@@ -74,6 +104,7 @@ class String
 		@soundY = @soundY/(view.viewSize.height+(2*@o.width))
 		@animateQuake()
 		@animateColor()
+		@makeSound()
 
 	animateColor:->
 		@twColor?.stop()
@@ -96,11 +127,12 @@ class String
 
 
 	animateQuake:->
+		@tw?.stop()
 		@anima = true
 		from = 
 			x: @base.segments[0].handleOut.x
 			y: @base.segments[0].handleOut.y
-			c: 1
+			c: 1000 * @index
 		to = 
 			x: 0
 			y: 0
@@ -120,49 +152,67 @@ class String
 			it.base.segments[0].handleOut.x = @x
 			it.base.segments[0].handleOut.y = @y
 			
-			# color = parseInt Math.abs (1-@c) * 255
-			# if !color then (color = 255)
-			# it.base.strokeColor = "rgb(#{color},#{color/2},#{color})"
 		@tw.onComplete =>
 			@teardown()
 
 		@tw.start()
 
+	makeSound:->
+		@twSound?.stop()
+
+		from = 
+			c: 2*(@index*25) + @soundX/4
+			t:1
+		to = 
+			c: (@index*25) + @soundX/4
+			t:0
+
+		@twSound = new TWEEN.Tween(from).to(to, @soundX)
+		@twSound.easing (t)->
+
+			b = Math.exp(-t*10)*Math.cos(Math.PI*2*t*10)
+			if t >= 1 then return 1
+			1 - b
+
+		it = @
+		@twSound.onStart =>
+			@oscillator.connect @o.context.destination
+			@oscillator?.noteOn 0
+
+		@twSound.onUpdate ->
+			it.oscillator.frequency.value = @c
+		@twSound.onComplete =>
+			@teardown()
+
+		@twSound.start()
+
 	teardown:->
+		@oscillator?.disconnect()
+
 		@base.segments[0].handleOut.x = 0
 		@base.segments[0].handleOut.y = 0
 		@anima = false
 		@touched = false
 		@base.strokeColor = @defaultColor
 
+
+
 class Strings
 	constructor:(o)->
 		@initialOffset = 100
 		@strings = []
-		@stringWidth = 10
+		@stringWidth = 25
+		@context = new webkitAudioContext()
+
 		@makeStrings()
-
-		@guitarShape = [
-					{
-						start: new Point [672, @initialOffset]
-						length: 10
-					}
-					{
-						start: new Point [672, @initialOffset + @stringWidth*1.5]
-						length: 10
-					}
-				]
-
-		console.log @guitarShape
-
 		@makebase()
-		# @guitar = new Raster('guitar')
-		# @guitar.position.y += 200
+
+	
 
 	makebase:->
 		@base = new Path.Circle [-100,-100], @stringWidth
 		@base.fillColor = '#FFF'
-		@base.opacity = .85
+		@base.opacity = .25
 
 	mouseMove:(e)->
 		@base.position = e.point
@@ -170,9 +220,9 @@ class Strings
 	makeStrings:(cnt=15)->
 		for i in [0...cnt]
 			string = new String
-				offset: @initialOffset+(i*@stringWidth*1.5)
+				offset: @initialOffset+(i*@stringWidth*3)
 				width: @stringWidth
-
+				context: @context
 
 			string.index = i
 
@@ -219,6 +269,50 @@ onMouseMove = (e)->
 
 
 
+# class Note
+# 	constructor:(o)->
+# 		@o = o
+# 		@makeBase()
+# 		@animate()
+
+# 	makeBase:(o)->
+# 		@char = new PointText @o.point
+# 		@char.characterStyle = 
+# 			fontSize: 30
+# 			font: 'ToneDeafBB'
+# 			fillColor: @o.color
+
+# 		@char.content = @o.char
+
+# 	animate:->
+# 		dfr = new $.Deferred
+# 		@tw = new TWEEN.Tween(@o.point).to(new Point([@o.point.x+h.getRand(-50,50),-100]), 1000)
+# 		it = @
+# 		@tw.onUpdate ->
+# 			it.char.position.x = @x
+# 			it.char.position.y = @y
+
+# 		@tw.onComplete =>
+# 			dfr.resolve()
+# 			$(@).trigger 'complete'
+
+# 		@tw.start()
+# 		dfr.promise()
+
+
+
+# setInterval ->
+
+# 	note = new Note(
+# 		point: new Point [200,200]
+# 		color: '#69D2E7'
+# 		char: 'c'
+# 	)
+
+# 	$(note).on 'complete', ->
+# 		`delete note`
+
+# , h.getRand(200,400)
 
 
 

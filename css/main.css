@@ -13,9 +13,12 @@ html {
   font-family: monospace;
 }
 .canvas-e {
-  background-color: #000;
+  background-color: #111;
 }
 .guitar-image-e {
   position: absolute;
   display: none;
+}
+.font-holder-e {
+  font-family: 'ToneDeafBB';
 }
