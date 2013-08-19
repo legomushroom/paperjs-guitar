@@ -46,35 +46,56 @@ class String
 	makeBase:->
 		@base = new Path
 		@xOffset = @o.offset
-		@base.add [@o.offset, @o.offsetY ]
-		@base.add [@o.offset, @o.offsetY + @o.length]
+		@base.add [@o.offsetX_start, @o.offsetY_start ]
+		@base.add [@o.offsetX_end, @o.offsetY_end]
+		@startX 	= 	Math.min @o.offsetX_start, @o.offsetX_end
+		@startY 	= 	Math.min @o.offsetY_start, @o.offsetY_end
+		@endX 	= 	Math.max @o.offsetX_start, @o.offsetX_end
+		@endtY 	= 	Math.max @o.offsetY_start, @o.offsetY_end
 		@base.strokeColor = @defaultColor
 		@base.strokeWidth = @o.width
 
-		@height = @o.length
+		@height = @o.offsetY_end - @o.offsetY_start
 
 	change:(e)->
+		point = e.point	
+		@dir = null
 		if e.delta.x > 0
-			if  ((e.point+e.delta).x >= @o.offset) and @o.offset >  mouseDown.x
-				if ((e.point+e.delta).y > @o.offsetY) and ((e.point+e.delta).y < @o.offsetY + @o.length)
+			if  ((e.point+e.delta).x >= @startX) and (mouseDown.x < @endX)
+				if ((e.point+e.delta).y >= @startY) and ((e.point+e.delta).y <=@endtY)
 					@touched = true
+					@dir ?= 'x'
 
 		if e.delta.x < 0
-			if  ((e.point-e.delta).x <= @o.offset) and @o.offset <  mouseDown.x
-				if ((e.point+e.delta).y > @o.offsetY) and ((e.point+e.delta).y < @o.offsetY + @o.length)
+			if  ((e.point-e.delta).x <= @endX) and @startX <  mouseDown.x
+				if ((e.point+e.delta).y > @startY) and ((e.point+e.delta).y <@endtY)
 					@touched = true
+					@dir ?= 'x'
+		
+		if e.delta.y < 0
+			if ((e.point+e.delta).y <=@endtY) and (@startY <  mouseDown.y)
+				if ((e.point+e.delta).x > @startX) and ((e.point+e.delta).x < @endX)
+					@touched = true
+					@dir ?= 'y'
 
-		point = e.point		
+		if e.delta.y > 0
+			if ((e.point+e.delta).y >= @startY) and (@o.offsetY_end >  mouseDown.y)
+				if ((e.point+e.delta).x > @startX) and ((e.point+e.delta).x < @endX)
+					@touched = true
+					@dir ?= 'y'
+
+
 		if !@touched then return
 
-		if (point.x > (@o.offset + @o.stringsOffset)) or (point.x <( @o.offset - @o.stringsOffset ))
-			@animate()
-			return
+		# if (@base.segments[0].handleOut.y > 200) or ((@base.segments[0].handleOut.x > 200))
+		# 		@animate()
+		# 		return
+
 
 		if @anima then return
 
-		@base.segments[0].handleOut.y = point.y - @o.offsetY
-		@base.segments[0].handleOut.x = point.x - @o.offset
+		@base.segments[0].handleOut.y = point.y - @startY
+		@base.segments[0].handleOut.x = point.x - @startX
 
 
 	animate:->
@@ -87,6 +108,7 @@ class String
 		@soundX = parseInt Math.abs @base.segments[0].handleOut.x
 		@soundY = parseInt Math.abs @base.segments[0].handleOut.y
 		@soundY = @soundY/(@height+(2*@o.width))
+		@meter = Math.max @soundX, @soundY
 		@animateQuake()
 		@animateColor()
 		@makeSound()
@@ -100,7 +122,7 @@ class String
 		to = 
 			t:1
 
-		@twColor = new TWEEN.Tween(from).to(to, @soundX*6)
+		@twColor = new TWEEN.Tween(from).to(to, @meter*6)
 
 		it = @
 		@twColor.onUpdate ->
@@ -112,6 +134,7 @@ class String
 
 
 	animateQuake:->
+		console.log  
 		@tw?.stop()
 		@anima = true
 		from = 
@@ -135,7 +158,7 @@ class String
 
 		@tw.onUpdate ->
 			it.base.segments[0].handleOut.x = @x
-			# it.base.segments[0].handleOut.y = @y
+			it.base.segments[0].handleOut.y = @y
 			
 		@tw.onComplete =>
 			@teardown()
@@ -152,7 +175,7 @@ class String
 			c: (@index*25) + @soundX/4
 			t:0
 
-		@twSound = new TWEEN.Tween(from).to(to, @soundX*6)
+		@twSound = new TWEEN.Tween(from).to(to, @meter*6)
 		@twSound.easing (t)->
 
 			b = Math.exp(-t*10)*Math.cos(Math.PI*2*t*10)
@@ -185,6 +208,31 @@ class String
 
 
 
+
+
+class Char 
+	constructor:(o)->
+		@o = o
+		@width = @o.width or 3
+
+		for item, i in text[@o.symbol]
+
+			string = new String
+				offsetX_start: item.offsetX_start
+				offsetX_end: 	item.offsetX_end
+				offsetY_start: item.offsetY_start
+				offsetY_end: 	item.offsetY_end
+				width: @width
+				context: @o.context
+				guitar: @o.guitar
+				i: i
+
+			string.index = i
+
+			@o.guitar.strings.push string
+
+
+
 class Strings
 	constructor:(o)->
 		@initialOffset = 300
@@ -196,6 +244,8 @@ class Strings
 		@makeStrings()
 		@makebase()
 
+		@makeM()
+
 	makebase:->
 		@base = new Path.Circle [-100,-100], @stringWidth*2
 		@base.fillColor = '#FFF'
@@ -205,9 +255,9 @@ class Strings
 		@guitar.position.y += 450
 		@guitar.position.x += 450
 
-		@text = new Raster 'text'
-		@text.position.y += 1000
-		@text.position.x += 450
+		# @text = new Raster 'text'
+		# @text.position.y += 1000
+		# @text.position.x += 450
 
 	mouseMove:(e)->
 		@base.position = e.point
@@ -220,9 +270,10 @@ class Strings
 			if i is 13 then offsetX = @initialOffset+(5*stringOffset)
 			if i is 14 then offsetX = @initialOffset+(7*stringOffset)
 			string = new String(
-				offset: offsetX
-				offsetY: o.offsetY
-				length: o.length
+				offsetX_start: offsetX
+				offsetX_end: offsetX
+				offsetY_start: o.offsetY
+				offsetY_end: o.offsetY + o.length
 				width: @stringWidth
 				context: @context
 				guitar: @
@@ -231,6 +282,13 @@ class Strings
 			string.index = i
 
 			@strings.push string
+
+	makeM:->
+		new Char
+			context: @context
+			guitar: @
+			symbol: 'M'
+
 
 	getOffset:(i)->
 		size = {}
@@ -310,17 +368,12 @@ class Strings
 strings = new Strings
 
 
-class M
-	constructor:->
 
-		string = new String(
-				offset: 100
-				offsetY: 100
-				length: 100
-				width: 	5
-				context: @context
-				guitar: @
-				i: i )
+
+
+
+
+
 
 
 onFrame = (e)->
