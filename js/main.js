@@ -42,7 +42,7 @@ String = (function() {
     this.touched = false;
     this.anima = false;
     this.colors = ["#69D2E7", "#A7DBD8", "#E0E4CC", "#F38630", "#FA6900", "#C02942", "#542437", "#53777A", "#ECD078", "#FE4365"];
-    this.defaultColor = "#222";
+    this.defaultColor = "#555";
     this.makeAudio();
     this.makeBase();
   }
@@ -51,7 +51,6 @@ String = (function() {
     this.analyser = this.o.context.createAnalyser();
     this.audio = new Audio;
     this.audio.controls = true;
-    console.log("sounds/" + this.o.guitar.sources[this.o.i % this.o.guitar.sources.length] + ".mp3");
     this.audio.src = "sounds/" + this.o.guitar.sources[this.o.i % this.o.guitar.sources.length] + ".mp3";
     this.source = this.o.context.createMediaElementSource(this.audio);
     this.source.connect(this.analyser);
@@ -233,7 +232,7 @@ Strings = (function() {
   function Strings(o) {
     this.initialOffset = 200;
     this.strings = [];
-    this.stringWidth = 25;
+    this.stringWidth = 5;
     this.context = new webkitAudioContext();
     this.sources = ['a3', 'b2', 'd3', 'e2', 'g2', 'a2', 'c', 'd2', 'f', 'g1', 'a1', 'b1', 'd1', 'e1'];
     this.makeStrings();
@@ -243,7 +242,10 @@ Strings = (function() {
   Strings.prototype.makebase = function() {
     this.base = new Path.Circle([-100, -100], this.stringWidth * 2);
     this.base.fillColor = '#FFF';
-    return this.base.opacity = .25;
+    this.base.opacity = .25;
+    this.guitar = new Raster('guitar');
+    this.guitar.position.y += 500;
+    return this.guitar.position.x += 370;
   };
 
   Strings.prototype.mouseMove = function(e) {
@@ -259,7 +261,7 @@ Strings = (function() {
     _results = [];
     for (i = _i = 0; 0 <= cnt ? _i < cnt : _i > cnt; i = 0 <= cnt ? ++_i : --_i) {
       string = new String({
-        offset: this.initialOffset + (i * this.stringWidth * 2.5),
+        offset: this.initialOffset + (i * this.stringWidth * 5),
         width: this.stringWidth,
         context: this.context,
         guitar: this,

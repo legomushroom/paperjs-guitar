@@ -29,7 +29,7 @@ class String
 		@touched = false
 		@anima = false
 		@colors = ["#69D2E7", "#A7DBD8", "#E0E4CC", "#F38630", "#FA6900", "#C02942", "#542437", "#53777A", "#ECD078", "#FE4365"]
-		@defaultColor = "#222"
+		@defaultColor = "#555"
 		@makeAudio()
 
 
@@ -39,7 +39,6 @@ class String
 		@analyser = @o.context.createAnalyser()
 		@audio = new Audio
 		@audio.controls = true
-		console.log "sounds/#{ @o.guitar.sources[@o.i % @o.guitar.sources.length]}.mp3"
 		@audio.src = "sounds/#{ @o.guitar.sources[@o.i % @o.guitar.sources.length]}.mp3"
 		@source = @o.context.createMediaElementSource(@audio)
 		@source.connect @analyser
@@ -189,7 +188,7 @@ class Strings
 	constructor:(o)->
 		@initialOffset = 200
 		@strings = []
-		@stringWidth = 25
+		@stringWidth = 5
 		@context = new webkitAudioContext()
 		@sources = ['a3', 'b2', 'd3', 'e2', 'g2', 'a2', 'c', 'd2', 'f', 'g1', 'a1', 'b1', 'd1', 'e1']
 
@@ -205,13 +204,17 @@ class Strings
 		@base.fillColor = '#FFF'
 		@base.opacity = .25
 
+		@guitar = new Raster 'guitar'
+		@guitar.position.y += 500
+		@guitar.position.x += 370
+
 	mouseMove:(e)->
 		@base.position = e.point
 
 	makeStrings:(cnt=14)->
 		for i in [0...cnt]
 			string = new String(
-				offset: @initialOffset+(i*@stringWidth*2.5)
+				offset: @initialOffset+(i*@stringWidth*5)
 				width: @stringWidth
 				context: @context
 				guitar: @
