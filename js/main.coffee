@@ -29,7 +29,7 @@ class String
 		@touched = false
 		@anima = false
 		@colors = ["#69D2E7", "#A7DBD8", "#E0E4CC", "#F38630", "#FA6900", "#C02942", "#542437", "#53777A", "#ECD078", "#FE4365"]
-		@defaultColor = "#555"
+		@defaultColor = "#fff"
 		@makeAudio()
 
 
@@ -51,8 +51,6 @@ class String
 		@base.add [@o.offset,view.viewSize.height+@o.width]
 		@base.strokeColor = @defaultColor
 		@base.strokeWidth = @o.width
-
-
 
 	change:(e)->
 		if e.delta.x > 0
@@ -206,12 +204,12 @@ class Strings
 
 		@guitar = new Raster 'guitar'
 		@guitar.position.y += 500
-		@guitar.position.x += 370
+		@guitar.position.x += 350
 
 	mouseMove:(e)->
 		@base.position = e.point
 
-	makeStrings:(cnt=14)->
+	makeStrings:(cnt=13)->
 		for i in [0...cnt]
 			string = new String(
 				offset: @initialOffset+(i*@stringWidth*5)
