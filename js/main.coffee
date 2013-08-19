@@ -25,15 +25,13 @@ mouseDrag = null
 class String
 	constructor:(o)->
 		@o = o
-		@o.stringsOffset ?=  @o.width*20
 		@touched = false
 		@anima = false
 		@colors = ["#69D2E7", "#A7DBD8", "#E0E4CC", "#F38630", "#FA6900", "#C02942", "#542437", "#53777A", "#ECD078", "#FE4365"]
 		@defaultColor = "#fff"
 		@makeAudio()
-
-
 		@makeBase()
+		@o.stringsOffset ?=  @o.width*15
 
 	makeAudio:->
 		@analyser = @o.context.createAnalyser()
@@ -47,19 +45,24 @@ class String
 
 	makeBase:->
 		@base = new Path
-		@base.add [@o.offset,-@o.width]
-		@base.add [@o.offset,view.viewSize.height+@o.width]
+		@xOffset = @o.offset
+		@base.add [@o.offset, @o.offsetY ]
+		@base.add [@o.offset, @o.offsetY + @o.length]
 		@base.strokeColor = @defaultColor
 		@base.strokeWidth = @o.width
+
+		@height = @o.length
 
 	change:(e)->
 		if e.delta.x > 0
 			if  ((e.point+e.delta).x >= @o.offset) and @o.offset >  mouseDown.x
-				@touched = true
+				if ((e.point+e.delta).y > @o.offsetY) and ((e.point+e.delta).y < @o.offsetY + @o.length)
+					@touched = true
 
 		if e.delta.x < 0
 			if  ((e.point-e.delta).x <= @o.offset) and @o.offset <  mouseDown.x
-				@touched = true
+				if ((e.point+e.delta).y > @o.offsetY) and ((e.point+e.delta).y < @o.offsetY + @o.length)
+					@touched = true
 
 		point = e.point		
 		if !@touched then return
@@ -70,7 +73,7 @@ class String
 
 		if @anima then return
 
-		@base.segments[0].handleOut.y = point.y
+		@base.segments[0].handleOut.y = point.y - @o.offsetY
 		@base.segments[0].handleOut.x = point.x - @o.offset
 
 
@@ -83,7 +86,7 @@ class String
 
 		@soundX = parseInt Math.abs @base.segments[0].handleOut.x
 		@soundY = parseInt Math.abs @base.segments[0].handleOut.y
-		@soundY = @soundY/(view.viewSize.height+(2*@o.width))
+		@soundY = @soundY/(@height+(2*@o.width))
 		@animateQuake()
 		@animateColor()
 		@makeSound()
@@ -91,7 +94,7 @@ class String
 	animateColor:->
 		@twColor?.stop()
 		@base.strokeColor = @colors[@index % @colors.length]
-		@base.strokeColor.saturation = @soundY*4
+		@base.strokeColor.saturation = 1
 		from = 
 			t:0
 		to = 
@@ -132,7 +135,7 @@ class String
 
 		@tw.onUpdate ->
 			it.base.segments[0].handleOut.x = @x
-			it.base.segments[0].handleOut.y = @y
+			# it.base.segments[0].handleOut.y = @y
 			
 		@tw.onComplete =>
 			@teardown()
@@ -184,7 +187,7 @@ class String
 
 class Strings
 	constructor:(o)->
-		@initialOffset = 200
+		@initialOffset = 300
 		@strings = []
 		@stringWidth = 5
 		@context = new webkitAudioContext()
@@ -193,26 +196,33 @@ class Strings
 		@makeStrings()
 		@makebase()
 
-	
-
-	
-
 	makebase:->
 		@base = new Path.Circle [-100,-100], @stringWidth*2
 		@base.fillColor = '#FFF'
 		@base.opacity = .25
 
 		@guitar = new Raster 'guitar'
-		@guitar.position.y += 500
-		@guitar.position.x += 350
+		@guitar.position.y += 450
+		@guitar.position.x += 450
+
+		@text = new Raster 'text'
+		@text.position.y += 1000
+		@text.position.x += 450
 
 	mouseMove:(e)->
 		@base.position = e.point
 
-	makeStrings:(cnt=13)->
+	makeStrings:(cnt=15)->
 		for i in [0...cnt]
+			o = @getOffset i
+			stringOffset = @stringWidth*5
+			offsetX = @initialOffset+(i*stringOffset)
+			if i is 13 then offsetX = @initialOffset+(5*stringOffset)
+			if i is 14 then offsetX = @initialOffset+(7*stringOffset)
 			string = new String(
-				offset: @initialOffset+(i*@stringWidth*5)
+				offset: offsetX
+				offsetY: o.offsetY
+				length: o.length
 				width: @stringWidth
 				context: @context
 				guitar: @
@@ -221,6 +231,68 @@ class Strings
 			string.index = i
 
 			@strings.push string
+
+	getOffset:(i)->
+		size = {}
+		switch i
+			when 0
+				size.length = 130
+				size.offsetY = 705
+
+			when 1
+				size.length = 205
+				size.offsetY = 650
+
+			when 2
+				size.length = 375
+				size.offsetY = 490
+
+			when 3
+				size.length = 395
+				size.offsetY = 480
+
+			when 4
+				size.length = 405
+				size.offsetY = 475
+
+			when 5
+				size.length = 405
+				size.offsetY = 475
+
+			when 6
+				size.length = 860
+				size.offsetY = 20
+
+			when 7
+				size.length = 405
+				size.offsetY = 475
+
+			when 8
+				size.length = 405
+				size.offsetY = 475
+
+			when 9
+				size.length = 395
+				size.offsetY = 480
+
+			when 10
+				size.length = 375
+				size.offsetY = 490
+
+			when 11
+				size.length = 205
+				size.offsetY = 650
+
+			when 12
+				size.length = 130
+				size.offsetY = 705
+
+			when 13, 14
+				size.length = 120
+				size.offsetY = 25
+		size
+
+
 
 	makeQuake:->
 		for string, i in @strings
@@ -236,6 +308,20 @@ class Strings
 			string.teardown()
 
 strings = new Strings
+
+
+class M
+	constructor:->
+
+		string = new String(
+				offset: 100
+				offsetY: 100
+				length: 100
+				width: 	5
+				context: @context
+				guitar: @
+				i: i )
+
 
 onFrame = (e)->
 	TWEEN.update()
