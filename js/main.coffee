@@ -29,36 +29,22 @@ class String
 		@touched = false
 		@anima = false
 		@colors = ["#69D2E7", "#A7DBD8", "#E0E4CC", "#F38630", "#FA6900", "#C02942", "#542437", "#53777A", "#ECD078", "#FE4365"]
-		@defaultColor = "#FFF"
-		@makeOsc()
+		@defaultColor = "#222"
+		@makeAudio()
+
 
 		@makeBase()
 
-	makeOsc:->
-		@oscillator = @o.context.createOscillator() 
-		@gainNode = @o.context.createGainNode()
-		@gainNode.gain.value = 0.01
-		@oscillator.connect @gainNode
-		# @oscillator.type = 3
-		@gainNode.connect @o.context.destination
+	makeAudio:->
+		@analyser = @o.context.createAnalyser()
+		@audio = new Audio
+		@audio.controls = true
+		console.log "sounds/#{ @o.guitar.sources[@o.i % @o.guitar.sources.length]}.mp3"
+		@audio.src = "sounds/#{ @o.guitar.sources[@o.i % @o.guitar.sources.length]}.mp3"
+		@source = @o.context.createMediaElementSource(@audio)
+		@source.connect @analyser
+		@analyser.connect @o.context.destination
 
-
-		curveLength = 100;
-		curve1 = new Float32Array(curveLength);
-		curve2 = new Float32Array(curveLength);
-		curve3 = new Float32Array(curveLength);
-
-		for i in [0...curveLength]
-			curve1[i] = Math.cos(Math.PI*i/(curveLength))*222
-
-		for i in [0...curveLength]
-			curve2[i] = Math.sin(Math.PI*i/(curveLength))*222
-
-		for i in [0...curveLength]
-			curve3[i] = Math.exp(Math.PI*i/(curveLength))
-
-		waveTable = @o.context.createWaveTable( curve1, curve2, curve3)
-		@oscillator.setWaveTable(waveTable)
 
 	makeBase:->
 		@base = new Path
@@ -66,7 +52,6 @@ class String
 		@base.add [@o.offset,view.viewSize.height+@o.width]
 		@base.strokeColor = @defaultColor
 		@base.strokeWidth = @o.width
-		# @base.opacity = .75
 
 
 
@@ -167,7 +152,7 @@ class String
 			c: (@index*25) + @soundX/4
 			t:0
 
-		@twSound = new TWEEN.Tween(from).to(to, @soundX)
+		@twSound = new TWEEN.Tween(from).to(to, @soundX*6)
 		@twSound.easing (t)->
 
 			b = Math.exp(-t*10)*Math.cos(Math.PI*2*t*10)
@@ -176,18 +161,21 @@ class String
 
 		it = @
 		@twSound.onStart =>
-			@oscillator.connect @o.context.destination
-			@oscillator?.noteOn 0
+			@audio.play()
 
-		@twSound.onUpdate ->
-			it.oscillator.frequency.value = @c
 		@twSound.onComplete =>
+			@stopAudio()
+
 			@teardown()
 
 		@twSound.start()
 
+	stopAudio:->
+		@audio.pause()
+		@audio.currentTime = 0
+
 	teardown:->
-		@oscillator?.disconnect()
+		@stopAudio()
 
 		@base.segments[0].handleOut.x = 0
 		@base.segments[0].handleOut.y = 0
@@ -199,30 +187,35 @@ class String
 
 class Strings
 	constructor:(o)->
-		@initialOffset = 100
+		@initialOffset = 200
 		@strings = []
 		@stringWidth = 25
 		@context = new webkitAudioContext()
+		@sources = ['a3', 'b2', 'd3', 'e2', 'g2', 'a2', 'c', 'd2', 'f', 'g1', 'a1', 'b1', 'd1', 'e1']
 
 		@makeStrings()
 		@makebase()
 
 	
 
+	
+
 	makebase:->
-		@base = new Path.Circle [-100,-100], @stringWidth
+		@base = new Path.Circle [-100,-100], @stringWidth*2
 		@base.fillColor = '#FFF'
 		@base.opacity = .25
 
 	mouseMove:(e)->
 		@base.position = e.point
 
-	makeStrings:(cnt=15)->
+	makeStrings:(cnt=14)->
 		for i in [0...cnt]
-			string = new String
-				offset: @initialOffset+(i*@stringWidth*5)
+			string = new String(
+				offset: @initialOffset+(i*@stringWidth*2.5)
 				width: @stringWidth
 				context: @context
+				guitar: @
+				i: i )
 
 			string.index = i
 
@@ -242,6 +235,7 @@ class Strings
 			string.teardown()
 
 strings = new Strings
+
 onFrame = (e)->
 	TWEEN.update()
 
@@ -265,56 +259,4 @@ onMouseUp = (e)->
 onMouseMove = (e)->
 	mouseMove = e.point
 	strings.mouseMove e
-
-
-
-
-# class Note
-# 	constructor:(o)->
-# 		@o = o
-# 		@makeBase()
-# 		@animate()
-
-# 	makeBase:(o)->
-# 		@char = new PointText @o.point
-# 		@char.characterStyle = 
-# 			fontSize: 30
-# 			font: 'ToneDeafBB'
-# 			fillColor: @o.color
-
-# 		@char.content = @o.char
-
-# 	animate:->
-# 		dfr = new $.Deferred
-# 		@tw = new TWEEN.Tween(@o.point).to(new Point([@o.point.x+h.getRand(-50,50),-100]), 1000)
-# 		it = @
-# 		@tw.onUpdate ->
-# 			it.char.position.x = @x
-# 			it.char.position.y = @y
-
-# 		@tw.onComplete =>
-# 			dfr.resolve()
-# 			$(@).trigger 'complete'
-
-# 		@tw.start()
-# 		dfr.promise()
-
-
-
-# setInterval ->
-
-# 	note = new Note(
-# 		point: new Point [200,200]
-# 		color: '#69D2E7'
-# 		char: 'c'
-# 	)
-
-# 	$(note).on 'complete', ->
-# 		`delete note`
-
-# , h.getRand(200,400)
-
-
-
-
 

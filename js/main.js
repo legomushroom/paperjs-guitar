@@ -42,34 +42,20 @@ String = (function() {
     this.touched = false;
     this.anima = false;
     this.colors = ["#69D2E7", "#A7DBD8", "#E0E4CC", "#F38630", "#FA6900", "#C02942", "#542437", "#53777A", "#ECD078", "#FE4365"];
-    this.defaultColor = "#FFF";
-    this.makeOsc();
+    this.defaultColor = "#222";
+    this.makeAudio();
     this.makeBase();
   }
 
-  String.prototype.makeOsc = function() {
-    var curve1, curve2, curve3, curveLength, i, waveTable, _i, _j, _k;
-
-    this.oscillator = this.o.context.createOscillator();
-    this.gainNode = this.o.context.createGainNode();
-    this.gainNode.gain.value = 0.01;
-    this.oscillator.connect(this.gainNode);
-    this.gainNode.connect(this.o.context.destination);
-    curveLength = 100;
-    curve1 = new Float32Array(curveLength);
-    curve2 = new Float32Array(curveLength);
-    curve3 = new Float32Array(curveLength);
-    for (i = _i = 0; 0 <= curveLength ? _i < curveLength : _i > curveLength; i = 0 <= curveLength ? ++_i : --_i) {
-      curve1[i] = Math.cos(Math.PI * i / curveLength) * 222;
-    }
-    for (i = _j = 0; 0 <= curveLength ? _j < curveLength : _j > curveLength; i = 0 <= curveLength ? ++_j : --_j) {
-      curve2[i] = Math.sin(Math.PI * i / curveLength) * 222;
-    }
-    for (i = _k = 0; 0 <= curveLength ? _k < curveLength : _k > curveLength; i = 0 <= curveLength ? ++_k : --_k) {
-      curve3[i] = Math.exp(Math.PI * i / curveLength);
-    }
-    waveTable = this.o.context.createWaveTable(curve1, curve2, curve3);
-    return this.oscillator.setWaveTable(waveTable);
+  String.prototype.makeAudio = function() {
+    this.analyser = this.o.context.createAnalyser();
+    this.audio = new Audio;
+    this.audio.controls = true;
+    console.log("sounds/" + this.o.guitar.sources[this.o.i % this.o.guitar.sources.length] + ".mp3");
+    this.audio.src = "sounds/" + this.o.guitar.sources[this.o.i % this.o.guitar.sources.length] + ".mp3";
+    this.source = this.o.context.createMediaElementSource(this.audio);
+    this.source.connect(this.analyser);
+    return this.analyser.connect(this.o.context.destination);
   };
 
   String.prototype.makeBase = function() {
@@ -204,7 +190,7 @@ String = (function() {
       c: (this.index * 25) + this.soundX / 4,
       t: 0
     };
-    this.twSound = new TWEEN.Tween(from).to(to, this.soundX);
+    this.twSound = new TWEEN.Tween(from).to(to, this.soundX * 6);
     this.twSound.easing(function(t) {
       var b;
 
@@ -216,26 +202,22 @@ String = (function() {
     });
     it = this;
     this.twSound.onStart(function() {
-      var _ref1;
-
-      _this.oscillator.connect(_this.o.context.destination);
-      return (_ref1 = _this.oscillator) != null ? _ref1.noteOn(0) : void 0;
-    });
-    this.twSound.onUpdate(function() {
-      return it.oscillator.frequency.value = this.c;
+      return _this.audio.play();
     });
     this.twSound.onComplete(function() {
+      _this.stopAudio();
       return _this.teardown();
     });
     return this.twSound.start();
   };
 
-  String.prototype.teardown = function() {
-    var _ref;
+  String.prototype.stopAudio = function() {
+    this.audio.pause();
+    return this.audio.currentTime = 0;
+  };
 
-    if ((_ref = this.oscillator) != null) {
-      _ref.disconnect();
-    }
+  String.prototype.teardown = function() {
+    this.stopAudio();
     this.base.segments[0].handleOut.x = 0;
     this.base.segments[0].handleOut.y = 0;
     this.anima = false;
@@ -249,16 +231,17 @@ String = (function() {
 
 Strings = (function() {
   function Strings(o) {
-    this.initialOffset = 100;
+    this.initialOffset = 200;
     this.strings = [];
     this.stringWidth = 25;
     this.context = new webkitAudioContext();
+    this.sources = ['a3', 'b2', 'd3', 'e2', 'g2', 'a2', 'c', 'd2', 'f', 'g1', 'a1', 'b1', 'd1', 'e1'];
     this.makeStrings();
     this.makebase();
   }
 
   Strings.prototype.makebase = function() {
-    this.base = new Path.Circle([-100, -100], this.stringWidth);
+    this.base = new Path.Circle([-100, -100], this.stringWidth * 2);
     this.base.fillColor = '#FFF';
     return this.base.opacity = .25;
   };
@@ -271,14 +254,16 @@ Strings = (function() {
     var i, string, _i, _results;
 
     if (cnt == null) {
-      cnt = 15;
+      cnt = 14;
     }
     _results = [];
     for (i = _i = 0; 0 <= cnt ? _i < cnt : _i > cnt; i = 0 <= cnt ? ++_i : --_i) {
       string = new String({
-        offset: this.initialOffset + (i * this.stringWidth * 5),
+        offset: this.initialOffset + (i * this.stringWidth * 2.5),
         width: this.stringWidth,
-        context: this.context
+        context: this.context,
+        guitar: this,
+        i: i
       });
       string.index = i;
       _results.push(this.strings.push(string));
