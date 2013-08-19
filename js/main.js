@@ -42,7 +42,7 @@ String = (function() {
     this.touched = false;
     this.anima = false;
     this.colors = ["#69D2E7", "#A7DBD8", "#E0E4CC", "#F38630", "#FA6900", "#C02942", "#542437", "#53777A", "#ECD078", "#FE4365"];
-    this.defaultColor = "#222";
+    this.defaultColor = "#FFF";
     this.makeOsc();
     this.makeBase();
   }
@@ -276,7 +276,7 @@ Strings = (function() {
     _results = [];
     for (i = _i = 0; 0 <= cnt ? _i < cnt : _i > cnt; i = 0 <= cnt ? ++_i : --_i) {
       string = new String({
-        offset: this.initialOffset + (i * this.stringWidth * 3),
+        offset: this.initialOffset + (i * this.stringWidth * 5),
         width: this.stringWidth,
         context: this.context
       });

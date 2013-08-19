@@ -29,7 +29,7 @@ class String
 		@touched = false
 		@anima = false
 		@colors = ["#69D2E7", "#A7DBD8", "#E0E4CC", "#F38630", "#FA6900", "#C02942", "#542437", "#53777A", "#ECD078", "#FE4365"]
-		@defaultColor = "#222"
+		@defaultColor = "#FFF"
 		@makeOsc()
 
 		@makeBase()
@@ -220,7 +220,7 @@ class Strings
 	makeStrings:(cnt=15)->
 		for i in [0...cnt]
 			string = new String
-				offset: @initialOffset+(i*@stringWidth*3)
+				offset: @initialOffset+(i*@stringWidth*5)
 				width: @stringWidth
 				context: @context
 
