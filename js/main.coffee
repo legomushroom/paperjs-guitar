@@ -214,14 +214,12 @@ class Char
 	constructor:(o)->
 		@o = o
 		@width = @o.width or 3
-
 		for item, i in text[@o.symbol]
-
 			string = new String
-				offsetX_start: item.offsetX_start
-				offsetX_end: 	item.offsetX_end
-				offsetY_start: item.offsetY_start
-				offsetY_end: 	item.offsetY_end
+				offsetX_start: item.offsetX_start 	+ @o.xOffset
+				offsetX_end: 	item.offsetX_end 	+ @o.xOffset
+				offsetY_start: item.offsetY_start 	+ @o.yOffset
+				offsetY_end: 	item.offsetY_end 	+ @o.yOffset
 				width: @width
 				context: @o.context
 				guitar: @o.guitar
@@ -288,6 +286,68 @@ class Strings
 			context: @context
 			guitar: @
 			symbol: 'M'
+			xOffset: 28
+			yOffset: 954
+
+		new Char
+			context: @context
+			guitar: @
+			symbol: 'U'
+			xOffset: 170
+			yOffset: 954
+
+		new Char
+			context: @context
+			guitar: @
+			symbol: 'S'
+			xOffset: 262
+			yOffset: 954
+
+		new Char
+			context: @context
+			guitar: @
+			symbol: 'I'
+			xOffset: 352
+			yOffset: 954
+
+		new Char
+			context: @context
+			guitar: @
+			symbol: 'C'
+			xOffset: 394
+			yOffset: 954
+
+		# SPACE
+
+		new Char
+			context: @context
+			guitar: @
+			symbol: 'T'
+			xOffset: 518
+			yOffset: 954
+
+		new Char
+			context: @context
+			guitar: @
+			symbol: 'I'
+			xOffset: 620
+			yOffset: 954
+
+		new Char
+			context: @context
+			guitar: @
+			symbol: 'M'
+			xOffset: 668
+			yOffset: 954
+
+		new Char
+			context: @context
+			guitar: @
+			symbol: 'E'
+			xOffset: 808
+			yOffset: 954
+
+
 
 
 	getOffset:(i)->

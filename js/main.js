@@ -273,10 +273,10 @@ Char = (function() {
     for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
       item = _ref[i];
       string = new String({
-        offsetX_start: item.offsetX_start,
-        offsetX_end: item.offsetX_end,
-        offsetY_start: item.offsetY_start,
-        offsetY_end: item.offsetY_end,
+        offsetX_start: item.offsetX_start + this.o.xOffset,
+        offsetX_end: item.offsetX_end + this.o.xOffset,
+        offsetY_start: item.offsetY_start + this.o.yOffset,
+        offsetY_end: item.offsetY_end + this.o.yOffset,
         width: this.width,
         context: this.o.context,
         guitar: this.o.guitar,
@@ -350,10 +350,68 @@ Strings = (function() {
   };
 
   Strings.prototype.makeM = function() {
+    new Char({
+      context: this.context,
+      guitar: this,
+      symbol: 'M',
+      xOffset: 28,
+      yOffset: 954
+    });
+    new Char({
+      context: this.context,
+      guitar: this,
+      symbol: 'U',
+      xOffset: 170,
+      yOffset: 954
+    });
+    new Char({
+      context: this.context,
+      guitar: this,
+      symbol: 'S',
+      xOffset: 262,
+      yOffset: 954
+    });
+    new Char({
+      context: this.context,
+      guitar: this,
+      symbol: 'I',
+      xOffset: 352,
+      yOffset: 954
+    });
+    new Char({
+      context: this.context,
+      guitar: this,
+      symbol: 'C',
+      xOffset: 394,
+      yOffset: 954
+    });
+    new Char({
+      context: this.context,
+      guitar: this,
+      symbol: 'T',
+      xOffset: 518,
+      yOffset: 954
+    });
+    new Char({
+      context: this.context,
+      guitar: this,
+      symbol: 'I',
+      xOffset: 620,
+      yOffset: 954
+    });
+    new Char({
+      context: this.context,
+      guitar: this,
+      symbol: 'M',
+      xOffset: 668,
+      yOffset: 954
+    });
     return new Char({
       context: this.context,
       guitar: this,
-      symbol: 'M'
+      symbol: 'E',
+      xOffset: 808,
+      yOffset: 954
     });
   };
 
