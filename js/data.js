@@ -444,7 +444,7 @@ text = {
     }, {
       offsetX_start: 122,
       offsetX_end: 122,
-      offsetY_start: 30,
+      offsetY_start: 1,
       offsetY_end: 94
     }, {
       offsetX_start: 116,

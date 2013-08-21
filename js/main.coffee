@@ -13,8 +13,8 @@ Path::reset = ->
 	@smooth()
 
 h = 
-	getRand:(min,max)->
-		Math.floor((Math.random() * ((max + 1) - min)) + min)
+    	getRand:(min,max)->
+        Math.floor((Math.random() * ((max + 1) - min)) + min)
 
 view.setViewSize $(window).outerWidth(), $(window).outerHeight()
 
@@ -25,13 +25,13 @@ mouseDrag = null
 class String
 	constructor:(o)->
 		@o = o
-		@touched 	= false
-		@anima 	= false
+		@touched = false
+		@anima = false
 		@colors = ["#69D2E7", "#A7DBD8", "#E0E4CC", "#F38630", "#FA6900", "#C02942", "#542437", "#53777A", "#ECD078", "#FE4365"]
-		@defaultColor = @o.color or "#fff"
+		@defaultColor = "#fff"
 		@makeAudio()
 		@makeBase()
-		@o.stringsOffset ?=  @o.width*20
+		@o.stringsOffset ?=  @o.width*15
 
 	makeAudio:->
 		@analyser = @o.context.createAnalyser()
@@ -51,8 +51,7 @@ class String
 		@startX 	= 	Math.min @o.offsetX_start, @o.offsetX_end
 		@startY 	= 	Math.min @o.offsetY_start, @o.offsetY_end
 		@endX 	= 	Math.max @o.offsetX_start, @o.offsetX_end
-		@endY 	= 	Math.max @o.offsetY_start, @o.offsetY_end
-		@middleX 	=  	if @endX isnt @startX then (@endX - @startX)/2 else @endX
+		@endtY 	= 	Math.max @o.offsetY_start, @o.offsetY_end
 		@base.strokeColor = @defaultColor
 		@base.strokeWidth = @o.width
 
@@ -61,21 +60,20 @@ class String
 	change:(e)->
 		point = e.point	
 		@dir = null
-
 		if e.delta.x > 0
-			if  ((e.point+e.delta).x >= @startX) and (@startX > mouseDown.x)
-				if ((e.point+e.delta).y >= @startY) and ((e.point+e.delta).y <=@endY)
+			if  ((e.point+e.delta).x >= @startX) and (mouseDown.x < @endX)
+				if ((e.point+e.delta).y >= @startY) and ((e.point+e.delta).y <=@endtY)
 					@touched = true
 					@dir ?= 'x'
 
 		if e.delta.x < 0
 			if  ((e.point-e.delta).x <= @endX) and @startX <  mouseDown.x
-				if ((e.point+e.delta).y > @startY) and ((e.point+e.delta).y <@endY)
+				if ((e.point+e.delta).y > @startY) and ((e.point+e.delta).y <@endtY)
 					@touched = true
 					@dir ?= 'x'
 		
 		if e.delta.y < 0
-			if ((e.point+e.delta).y <=@endY) and (@startY <  mouseDown.y)
+			if ((e.point+e.delta).y <=@endtY) and (@startY <  mouseDown.y)
 				if ((e.point+e.delta).x > @startX) and ((e.point+e.delta).x < @endX)
 					@touched = true
 					@dir ?= 'y'
@@ -89,15 +87,12 @@ class String
 
 		if !@touched then return
 
-
-
-		if (point.x  > @middleX + @o.stringsOffset)
-				@animate()
-				return
+		# if (@base.segments[0].handleOut.y > 200) or ((@base.segments[0].handleOut.x > 200))
+		# 		@animate()
+		# 		return
 
 
 		if @anima then return
-
 
 		@base.segments[0].handleOut.y = point.y - @startY
 		@base.segments[0].handleOut.x = point.x - @startX
@@ -111,9 +106,9 @@ class String
 		if @base.segments[0].handleOut.x is 0 then return
 
 		@soundX = parseInt Math.abs @base.segments[0].handleOut.x
-		@soundY_proto = parseInt Math.abs @base.segments[0].handleOut.y
-		@soundY = @soundY_proto/(@height+(2*@o.width))
-		@meter = Math.max @soundX, @soundY_proto
+		@soundY = parseInt Math.abs @base.segments[0].handleOut.y
+		@soundY = @soundY/(@height+(2*@o.width))
+		@meter = Math.max @soundX, @soundY
 		@animateQuake()
 		@animateColor()
 		@makeSound()
@@ -121,7 +116,7 @@ class String
 	animateColor:->
 		@twColor?.stop()
 		@base.strokeColor = @colors[@index % @colors.length]
-		@base.strokeColor.saturation = 4
+		@base.strokeColor.saturation = 1
 		from = 
 			t:0
 		to = 
@@ -161,15 +156,9 @@ class String
 
 		it = @
 
-		@tw.onStart =>
-			if @startY isnt @endY
-				it.base.segments[0].handleOut.y = 0
-
-
 		@tw.onUpdate ->
 			it.base.segments[0].handleOut.x = @x
-			if @startY is @endY
-				it.base.segments[0].handleOut.y = @y
+			it.base.segments[0].handleOut.y = @y
 			
 		@tw.onComplete =>
 			@teardown()
@@ -196,7 +185,6 @@ class String
 		it = @
 		@twSound.onStart =>
 			@audio.play()
-			@played = true
 
 		@twSound.onComplete =>
 			@stopAudio()
@@ -206,14 +194,12 @@ class String
 		@twSound.start()
 
 	stopAudio:->
-		if @played
-			@audio?.pause()
-			@audio?.currentTime = 0
+		@audio.pause()
+		@audio.currentTime = 0
 
 	teardown:->
 		@stopAudio()
-		mouseDown?.x = @endX + 1
-		mouseDown?.y = @endY + 1
+
 		@base.segments[0].handleOut.x = 0
 		@base.segments[0].handleOut.y = 0
 		@anima = false
@@ -237,7 +223,6 @@ class Char
 				width: @width
 				context: @o.context
 				guitar: @o.guitar
-				color: '#fff'
 				i: i
 
 			string.index = i
@@ -268,6 +253,9 @@ class Strings
 		@guitar.position.y += 450
 		@guitar.position.x += 450
 
+		# @text = new Raster 'text'
+		# @text.position.y += 1000
+		# @text.position.x += 450
 
 	mouseMove:(e)->
 		@base.position = e.point
@@ -294,44 +282,40 @@ class Strings
 			@strings.push string
 
 	makeM:->
-		@y 	= 150
-		@y2 	= 330
-		@x 	= 650
-		@x2 	= 200
 		new Char
 			context: @context
 			guitar: @
 			symbol: 'M'
-			xOffset: @x + 28
-			yOffset: @y
+			xOffset: 28
+			yOffset: 954
 
 		new Char
 			context: @context
 			guitar: @
 			symbol: 'U'
-			xOffset: @x + 170
-			yOffset: @y
+			xOffset: 170
+			yOffset: 954
 
 		new Char
 			context: @context
 			guitar: @
 			symbol: 'S'
-			xOffset: @x + 262
-			yOffset: @y
+			xOffset: 262
+			yOffset: 954
 
 		new Char
 			context: @context
 			guitar: @
 			symbol: 'I'
-			xOffset: @x + 352
-			yOffset: @y
+			xOffset: 352
+			yOffset: 954
 
 		new Char
 			context: @context
 			guitar: @
 			symbol: 'C'
-			xOffset: @x + 394
-			yOffset: @y
+			xOffset: 394
+			yOffset: 954
 
 		# SPACE
 
@@ -339,29 +323,29 @@ class Strings
 			context: @context
 			guitar: @
 			symbol: 'T'
-			xOffset: @x2 + 518
-			yOffset: @y2
+			xOffset: 518
+			yOffset: 954
 
 		new Char
 			context: @context
 			guitar: @
 			symbol: 'I'
-			xOffset: @x2 + 620
-			yOffset: @y2
+			xOffset: 620
+			yOffset: 954
 
 		new Char
 			context: @context
 			guitar: @
 			symbol: 'M'
-			xOffset: @x2 + 668
-			yOffset: @y2
+			xOffset: 668
+			yOffset: 954
 
 		new Char
 			context: @context
 			guitar: @
 			symbol: 'E'
-			xOffset: @x2 + 808
-			yOffset: @y2
+			xOffset: 808
+			yOffset: 954
 
 
 

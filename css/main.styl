@@ -9,128 +9,9 @@ body, html
 	padding 0
 	overflow hidden
 	font-family monospace
-	background-color: black
-
-
-
-.twitter-icon-b
-	position:  absolute
-	left: 750px
-	top 475px
-
-	.circle1-be, .circle2-be, .circle3-be
-		rect 10px
-		position:  absolute
-		background-color #00ACED
-		border-radius:  50%
-		top 150px
-		left: 150px
-		z-index: 2
-
-	.circle2-be
-		background-color lighten(#00ACED,10)
-		z-index: 1
-
-	.circle3-be
-		background-color lighten(#00ACED,20)
-		z-index: 0
-
-	.twitter-icon-text-be
-		color white
-		text-decoration: none
-		position absolute
-		z-index: 11
-		top 150px
-		left: 50px
-		opacity: 0
-
-	.twitter-mask-be
-		position relative
-		z-index 9
-
-	.hover-circle-be
-		rect 50px
-		position absolute
-		top 130px
-		left: 130px
-		z-index 10
-		overflow hidden
-
-		&:hover
-			rect 200px
-			top 50px
-			left 50px
-
-		&:hover ~ .circle1-be, &:hover ~ .circle2-be, &:hover ~ .circle3-be
-			rect 250px
-			top: 20px
-			left: 20px
-
-		&:hover ~ .circle1-be
-			-webkit-transition: all .9s ease-out;
-			-moz-transition: all .9s ease-out;
-			-ms-transition: all .9s ease-out;
-			-o-transition: all .9s ease-out;
-
-		&:hover ~ .circle2-be
-			-webkit-transition: all .7s ease-out;
-			-moz-transition: all .7s ease-out;
-			-ms-transition: all .7s ease-out;
-			-o-transition: all .7s ease-out;
-
-		&:hover ~ .circle3-be
-			-webkit-transition: all .5s ease-out;
-			-moz-transition: all .5s ease-out;
-			-ms-transition: all .5s ease-out;
-			-o-transition: all .5s ease-out;
-
-		&:hover .twitter-icon-text-be
-			left: 50px
-			top 100px
-			opacity 1
-			-webkit-transition: all .5s ease-out;
-			   -moz-transition: all .5s ease-out;
-			    -ms-transition: all .5s ease-out;
-			     -o-transition: all .5s ease-out;
-			        transition: all .5s ease-out;
 
 .canvas-e
-	background-color transparent
-	position relative
-	z-index: 10
-
-	&:hover ~ .circle1-be, &:hover ~ .circle2-be, &:hover ~ .circle3-be
-		top 530px
-		left 800px
-		rect 250px
-
-	&:hover ~ .circle1-be
-		-webkit-transition: all .9s ease-out;
-		-moz-transition: all 1s ease-out;
-		-ms-transition: all 1s ease-out;
-		-o-transition: all 1s ease-out;
-
-	&:hover ~ .circle2-be
-		-webkit-transition: all .7s ease-out;
-		-moz-transition: all .7s ease-out;
-		-ms-transition: all .7s ease-out;
-		-o-transition: all .7s ease-out;
-
-	&:hover ~ .circle2-be
-		-webkit-transition: all .5s ease-out;
-		-moz-transition: all .5s ease-out;
-		-ms-transition: all .5s ease-out;
-		-o-transition: all .5s ease-out;
-
-	&:hover ~ .twitter-icon-e
-		left: 880px
-		opacity 1
-		-webkit-transition: all .5s ease-out;
-		   -moz-transition: all .5s ease-out;
-		    -ms-transition: all .5s ease-out;
-		     -o-transition: all .5s ease-out;
-		        transition: all .5s ease-out;
-		
+	background-color #111
 
 .guitar-image-e
 	position absolute
@@ -138,4 +19,9 @@ body, html
 
 .font-holder-e
 	font-family: 'ToneDeafBB'
-
+	// color white
+	// position absolute
+	// z-index: 20
+	// top 20px
+	// left 20px
+	// font-size 200px
