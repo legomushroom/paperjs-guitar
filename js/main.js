@@ -44,10 +44,14 @@ String = (function() {
     this.makeBase();
     if ((_ref = (_base = this.o).stringsOffset) == null) {
 <<<<<<< HEAD
+<<<<<<< HEAD
       _base.stringsOffset = this.o.width * 15;
 =======
       _base.stringsOffset = this.o.width * 25;
 >>>>>>> parent of e0d9415... ++
+=======
+      _base.stringsOffset = this.o.width * 30;
+>>>>>>> parent of 9a4f4f3... Revert "++"
     }
   }
 
@@ -77,39 +81,48 @@ String = (function() {
 
   String.prototype.change = function(e) {
 <<<<<<< HEAD
+<<<<<<< HEAD
     var point, _ref, _ref1, _ref2, _ref3;
 =======
     var point, x, x_minus, x_plus, y, y_minus, y_plus, _ref, _ref1, _ref2, _ref3;
 >>>>>>> parent of e0d9415... ++
+=======
+    var point, x, x_minus, x_plus, y, y_minus, y_plus;
+>>>>>>> parent of 9a4f4f3... Revert "++"
 
     point = e.point;
-    this.dir = null;
+    this.a = null;
+    if (this.anima) {
+      return;
+    }
     if (e.delta.x > 0) {
+<<<<<<< HEAD
 <<<<<<< HEAD
       if (((e.point + e.delta).x >= this.startX) && (mouseDown.x < this.endX)) {
         if (((e.point + e.delta).y >= this.startY) && ((e.point + e.delta).y <= this.endtY)) {
 =======
       if (((e.point + e.delta).x >= this.startX) && (this.startX > mouseDown.x)) {
+=======
+      if (((e.point + e.delta).x >= this.startX) && (mouseDown.x < this.startX)) {
+>>>>>>> parent of 9a4f4f3... Revert "++"
         if (((e.point + e.delta).y >= this.startY) && ((e.point + e.delta).y <= this.endY)) {
 >>>>>>> parent of e0d9415... ++
           this.touched = true;
-          if ((_ref = this.dir) == null) {
-            this.dir = 'x';
-          }
         }
       }
     }
     if (e.delta.x < 0) {
+<<<<<<< HEAD
       if (((e.point - e.delta).x <= this.endX) && this.startX < mouseDown.x) {
 <<<<<<< HEAD
         if (((e.point + e.delta).y > this.startY) && ((e.point + e.delta).y < this.endtY)) {
 =======
+=======
+      if (((e.point - e.delta).x <= this.endX) && (mouseDown.x > this.endX)) {
+>>>>>>> parent of 9a4f4f3... Revert "++"
         if (((e.point + e.delta).y > this.startY) && ((e.point + e.delta).y < this.endY)) {
 >>>>>>> parent of e0d9415... ++
           this.touched = true;
-          if ((_ref1 = this.dir) == null) {
-            this.dir = 'x';
-          }
         }
       }
     }
@@ -117,9 +130,6 @@ String = (function() {
       if (((e.point + e.delta).y <= this.endtY) && (this.startY < mouseDown.y)) {
         if (((e.point + e.delta).x > this.startX) && ((e.point + e.delta).x < this.endX)) {
           this.touched = true;
-          if ((_ref2 = this.dir) == null) {
-            this.dir = 'y';
-          }
         }
       }
     }
@@ -127,9 +137,6 @@ String = (function() {
       if (((e.point + e.delta).y >= this.startY) && (this.o.offsetY_end > mouseDown.y)) {
         if (((e.point + e.delta).x > this.startX) && ((e.point + e.delta).x < this.endX)) {
           this.touched = true;
-          if ((_ref3 = this.dir) == null) {
-            this.dir = 'y';
-          }
         }
       }
     }
@@ -140,12 +147,15 @@ String = (function() {
       return;
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
     this.base.segments[0].handleOut.y = point.y - this.startY;
     return this.base.segments[0].handleOut.x = point.x - this.startX;
 =======
     if (this.anima) {
       return;
     }
+=======
+>>>>>>> parent of 9a4f4f3... Revert "++"
     x = this.o.offsetX_end < this.o.offsetX_start ? this.endX : this.startX;
     y = this.o.offsetY_end < this.o.offsetY_start ? this.endY : this.startY;
     this.base.segments[0].handleOut.y = point.y - y;
@@ -159,9 +169,6 @@ String = (function() {
       return;
     }
     this.anima = true;
-    if (this.base.segments[0].handleOut.x === 0) {
-      return;
-    }
     this.soundX = parseInt(Math.abs(this.base.segments[0].handleOut.x));
     this.soundY = parseInt(Math.abs(this.base.segments[0].handleOut.y));
     this.soundY = this.soundY / (this.height + (2 * this.o.width));
