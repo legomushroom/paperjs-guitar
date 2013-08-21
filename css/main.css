@@ -50,6 +50,10 @@ html {
 .twitter-icon-b .twitter-mask-be {
   position: relative;
   z-index: 9;
+  background: transparent url("../i/twitter.png") no-repeat center center;
+  width: 300px;
+  height: 300px;
+  display: none;
 }
 .twitter-icon-b .hover-circle-be {
   width: 50px;
@@ -65,6 +69,9 @@ html {
   height: 200px;
   top: 50px;
   left: 50px;
+}
+.twitter-icon-b .hover-circle-be:hover ~ .twitter-mask-be {
+  display: block;
 }
 .twitter-icon-b .hover-circle-be:hover ~ .circle1-be,
 .twitter-icon-b .hover-circle-be:hover ~ .circle2-be,
@@ -104,8 +111,6 @@ html {
 }
 .canvas-e {
   background-color: transparent;
-  position: relative;
-  z-index: 10;
 }
 .canvas-e:hover ~ .circle1-be,
 .canvas-e:hover ~ .circle2-be,
