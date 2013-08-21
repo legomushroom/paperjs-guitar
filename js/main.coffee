@@ -31,7 +31,7 @@ class String
 		@defaultColor = @o.color or "#fff"
 		@makeAudio()
 		@makeBase()
-		@o.stringsOffset ?=  @o.width*30
+		@o.stringsOffset ?=  @o.width*25
 
 	makeAudio:->
 		@analyser = @o.context.createAnalyser()
@@ -46,15 +46,12 @@ class String
 	makeBase:->
 		@base = new Path
 		@xOffset = @o.offset
-		
 		@base.add [@o.offsetX_start, @o.offsetY_start ]
 		@base.add [@o.offsetX_end, @o.offsetY_end]
-		
 		@startX 	= 	Math.min @o.offsetX_start, @o.offsetX_end
 		@startY 	= 	Math.min @o.offsetY_start, @o.offsetY_end
 		@endX 	= 	Math.max @o.offsetX_start, @o.offsetX_end
 		@endY 	= 	Math.max @o.offsetY_start, @o.offsetY_end
-
 		@middleX 	=  		if (@endX isnt @startX) then parseInt((@endX - @startX)/2) else @endX
 		@middleX_point =  	if (@endX isnt @startX) then @endX - @middleX else @endX
 
@@ -68,31 +65,32 @@ class String
 
 	change:(e)->
 		point = e.point	
-		@a = null
-		if @anima then return
-
+		@dir = null
 
 		if e.delta.x > 0
-			if  ((e.point+e.delta).x >= @startX) and (mouseDown.x < @startX)
-				if ((e.point+e.delta).y >= @startY) and ((e.point+e.delta).y <= @endY)
+			if  ((e.point+e.delta).x >= @startX) and (@startX > mouseDown.x)
+				if ((e.point+e.delta).y >= @startY) and ((e.point+e.delta).y <=@endY)
 					@touched = true
+					@dir ?= 'x'
 
 		if e.delta.x < 0
-			if  ((e.point-e.delta).x <= @endX) and (mouseDown.x > @endX)
+			if  ((e.point-e.delta).x <= @endX) and @startX <  mouseDown.x
 				if ((e.point+e.delta).y > @startY) and ((e.point+e.delta).y <@endY)
 					@touched = true
-
+					@dir ?= 'x'
+		
 		if e.delta.y < 0
 			if ((e.point+e.delta).y <=@endY) and (@startY <  mouseDown.y)
 				if ((e.point+e.delta).x > @startX) and ((e.point+e.delta).x < @endX)
 					@touched = true
+					@dir ?= 'y'
 
 		if e.delta.y > 0
 			if ((e.point+e.delta).y >= @startY) and (@o.offsetY_end >  mouseDown.y)
 				if ((e.point+e.delta).x > @startX) and ((e.point+e.delta).x < @endX)
 					@touched = true
+					@dir ?= 'y'
 
-		
 
 		if !@touched then return
 
@@ -102,10 +100,11 @@ class String
 		y_plus = ((point.y  > @middleY_point + @o.stringsOffset) and (e.delta.y > 0))
 		y_minus = ((point.y  < @middleY_point - @o.stringsOffset) and (e.delta.y < 0))
 
-		if (x_plus or x_minus or y_plus or y_minus)
+		if x_plus or x_minus or y_plus or y_minus
 				@animate()
 				return
 
+		if @anima then return
 
 		x = if @o.offsetX_end < @o.offsetX_start then @endX else @startX
 		y = if @o.offsetY_end < @o.offsetY_start then @endY else @startY
@@ -118,6 +117,8 @@ class String
 		@touched = false
 		if @anima then return
 		@anima = true
+
+		if @base.segments[0].handleOut.x is 0 then return
 
 		@soundX = parseInt Math.abs @base.segments[0].handleOut.x
 		@soundY_proto = parseInt Math.abs @base.segments[0].handleOut.y
@@ -210,8 +211,8 @@ class String
 			@played = true
 
 		@twSound.onComplete =>
-			if @played
-				@stopAudio()
+			@stopAudio()
+
 			@teardown()
 
 		@twSound.start()
@@ -299,6 +300,7 @@ class Strings
 				i: i )
 
 			string.index = i
+
 			@strings.push string
 
 	makeM:->
@@ -452,19 +454,19 @@ class Strings
 strings = new Strings
 
 
-class Note
-	constructor:(o)->
-		@o = o
 
 
-new Note
+
+
+
+
+
 
 onFrame = (e)->
 	TWEEN.update()
 
 
 onMouseDrag = (e)->
-
 	strings.changeStrings e
 	strings.mouseMove e
 

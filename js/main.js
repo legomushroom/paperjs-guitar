@@ -43,7 +43,7 @@ String = (function() {
     this.makeAudio();
     this.makeBase();
     if ((_ref = (_base = this.o).stringsOffset) == null) {
-      _base.stringsOffset = this.o.width * 30;
+      _base.stringsOffset = this.o.width * 25;
     }
   }
 
@@ -76,24 +76,27 @@ String = (function() {
   };
 
   String.prototype.change = function(e) {
-    var point, x, x_minus, x_plus, y, y_minus, y_plus;
+    var point, x, x_minus, x_plus, y, y_minus, y_plus, _ref, _ref1, _ref2, _ref3;
 
     point = e.point;
-    this.a = null;
-    if (this.anima) {
-      return;
-    }
+    this.dir = null;
     if (e.delta.x > 0) {
-      if (((e.point + e.delta).x >= this.startX) && (mouseDown.x < this.startX)) {
+      if (((e.point + e.delta).x >= this.startX) && (this.startX > mouseDown.x)) {
         if (((e.point + e.delta).y >= this.startY) && ((e.point + e.delta).y <= this.endY)) {
           this.touched = true;
+          if ((_ref = this.dir) == null) {
+            this.dir = 'x';
+          }
         }
       }
     }
     if (e.delta.x < 0) {
-      if (((e.point - e.delta).x <= this.endX) && (mouseDown.x > this.endX)) {
+      if (((e.point - e.delta).x <= this.endX) && this.startX < mouseDown.x) {
         if (((e.point + e.delta).y > this.startY) && ((e.point + e.delta).y < this.endY)) {
           this.touched = true;
+          if ((_ref1 = this.dir) == null) {
+            this.dir = 'x';
+          }
         }
       }
     }
@@ -101,6 +104,9 @@ String = (function() {
       if (((e.point + e.delta).y <= this.endY) && (this.startY < mouseDown.y)) {
         if (((e.point + e.delta).x > this.startX) && ((e.point + e.delta).x < this.endX)) {
           this.touched = true;
+          if ((_ref2 = this.dir) == null) {
+            this.dir = 'y';
+          }
         }
       }
     }
@@ -108,6 +114,9 @@ String = (function() {
       if (((e.point + e.delta).y >= this.startY) && (this.o.offsetY_end > mouseDown.y)) {
         if (((e.point + e.delta).x > this.startX) && ((e.point + e.delta).x < this.endX)) {
           this.touched = true;
+          if ((_ref3 = this.dir) == null) {
+            this.dir = 'y';
+          }
         }
       }
     }
@@ -122,6 +131,9 @@ String = (function() {
       this.animate();
       return;
     }
+    if (this.anima) {
+      return;
+    }
     x = this.o.offsetX_end < this.o.offsetX_start ? this.endX : this.startX;
     y = this.o.offsetY_end < this.o.offsetY_start ? this.endY : this.startY;
     this.base.segments[0].handleOut.y = point.y - y;
@@ -134,6 +146,9 @@ String = (function() {
       return;
     }
     this.anima = true;
+    if (this.base.segments[0].handleOut.x === 0) {
+      return;
+    }
     this.soundX = parseInt(Math.abs(this.base.segments[0].handleOut.x));
     this.soundY_proto = parseInt(Math.abs(this.base.segments[0].handleOut.y));
     this.soundY = this.soundY_proto / (this.height + (2 * this.o.width));
