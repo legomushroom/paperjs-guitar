@@ -39,11 +39,11 @@ String = (function() {
     this.touched = false;
     this.anima = false;
     this.colors = ["#69D2E7", "#A7DBD8", "#E0E4CC", "#F38630", "#FA6900", "#C02942", "#542437", "#53777A", "#ECD078", "#FE4365"];
-    this.defaultColor = "#fff";
+    this.defaultColor = this.o.color || "#fff";
     this.makeAudio();
     this.makeBase();
     if ((_ref = (_base = this.o).stringsOffset) == null) {
-      _base.stringsOffset = this.o.width * 15;
+      _base.stringsOffset = this.o.width * 20;
     }
   }
 
@@ -65,7 +65,8 @@ String = (function() {
     this.startX = Math.min(this.o.offsetX_start, this.o.offsetX_end);
     this.startY = Math.min(this.o.offsetY_start, this.o.offsetY_end);
     this.endX = Math.max(this.o.offsetX_start, this.o.offsetX_end);
-    this.endtY = Math.max(this.o.offsetY_start, this.o.offsetY_end);
+    this.endY = Math.max(this.o.offsetY_start, this.o.offsetY_end);
+    this.middleX = this.endX !== this.startX ? (this.endX - this.startX) / 2 : this.endX;
     this.base.strokeColor = this.defaultColor;
     this.base.strokeWidth = this.o.width;
     return this.height = this.o.offsetY_end - this.o.offsetY_start;
@@ -77,8 +78,8 @@ String = (function() {
     point = e.point;
     this.dir = null;
     if (e.delta.x > 0) {
-      if (((e.point + e.delta).x >= this.startX) && (mouseDown.x < this.endX)) {
-        if (((e.point + e.delta).y >= this.startY) && ((e.point + e.delta).y <= this.endtY)) {
+      if (((e.point + e.delta).x >= this.startX) && (this.startX > mouseDown.x)) {
+        if (((e.point + e.delta).y >= this.startY) && ((e.point + e.delta).y <= this.endY)) {
           this.touched = true;
           if ((_ref = this.dir) == null) {
             this.dir = 'x';
@@ -88,7 +89,7 @@ String = (function() {
     }
     if (e.delta.x < 0) {
       if (((e.point - e.delta).x <= this.endX) && this.startX < mouseDown.x) {
-        if (((e.point + e.delta).y > this.startY) && ((e.point + e.delta).y < this.endtY)) {
+        if (((e.point + e.delta).y > this.startY) && ((e.point + e.delta).y < this.endY)) {
           this.touched = true;
           if ((_ref1 = this.dir) == null) {
             this.dir = 'x';
@@ -97,7 +98,7 @@ String = (function() {
       }
     }
     if (e.delta.y < 0) {
-      if (((e.point + e.delta).y <= this.endtY) && (this.startY < mouseDown.y)) {
+      if (((e.point + e.delta).y <= this.endY) && (this.startY < mouseDown.y)) {
         if (((e.point + e.delta).x > this.startX) && ((e.point + e.delta).x < this.endX)) {
           this.touched = true;
           if ((_ref2 = this.dir) == null) {
@@ -119,6 +120,10 @@ String = (function() {
     if (!this.touched) {
       return;
     }
+    if (point.x > this.middleX + this.o.stringsOffset) {
+      this.animate();
+      return;
+    }
     if (this.anima) {
       return;
     }
@@ -136,9 +141,9 @@ String = (function() {
       return;
     }
     this.soundX = parseInt(Math.abs(this.base.segments[0].handleOut.x));
-    this.soundY = parseInt(Math.abs(this.base.segments[0].handleOut.y));
-    this.soundY = this.soundY / (this.height + (2 * this.o.width));
-    this.meter = Math.max(this.soundX, this.soundY);
+    this.soundY_proto = parseInt(Math.abs(this.base.segments[0].handleOut.y));
+    this.soundY = this.soundY_proto / (this.height + (2 * this.o.width));
+    this.meter = Math.max(this.soundX, this.soundY_proto);
     this.animateQuake();
     this.animateColor();
     return this.makeSound();
@@ -151,7 +156,7 @@ String = (function() {
       _ref.stop();
     }
     this.base.strokeColor = this.colors[this.index % this.colors.length];
-    this.base.strokeColor.saturation = 1;
+    this.base.strokeColor.saturation = 4;
     from = {
       t: 0
     };
@@ -199,9 +204,16 @@ String = (function() {
       return 1 - b;
     });
     it = this;
+    this.tw.onStart(function() {
+      if (_this.startY !== _this.endY) {
+        return it.base.segments[0].handleOut.y = 0;
+      }
+    });
     this.tw.onUpdate(function() {
       it.base.segments[0].handleOut.x = this.x;
-      return it.base.segments[0].handleOut.y = this.y;
+      if (this.startY === this.endY) {
+        return it.base.segments[0].handleOut.y = this.y;
+      }
     });
     this.tw.onComplete(function() {
       return _this.teardown();
@@ -236,7 +248,8 @@ String = (function() {
     });
     it = this;
     this.twSound.onStart(function() {
-      return _this.audio.play();
+      _this.audio.play();
+      return _this.played = true;
     });
     this.twSound.onComplete(function() {
       _this.stopAudio();
@@ -246,12 +259,24 @@ String = (function() {
   };
 
   String.prototype.stopAudio = function() {
-    this.audio.pause();
-    return this.audio.currentTime = 0;
+    var _ref, _ref1;
+
+    if (this.played) {
+      if ((_ref = this.audio) != null) {
+        _ref.pause();
+      }
+      return (_ref1 = this.audio) != null ? _ref1.currentTime = 0 : void 0;
+    }
   };
 
   String.prototype.teardown = function() {
     this.stopAudio();
+    if (mouseDown != null) {
+      mouseDown.x = this.endX + 1;
+    }
+    if (mouseDown != null) {
+      mouseDown.y = this.endY + 1;
+    }
     this.base.segments[0].handleOut.x = 0;
     this.base.segments[0].handleOut.y = 0;
     this.anima = false;
@@ -280,6 +305,7 @@ Char = (function() {
         width: this.width,
         context: this.o.context,
         guitar: this.o.guitar,
+        color: '#fff',
         i: i
       });
       string.index = i;
@@ -350,68 +376,72 @@ Strings = (function() {
   };
 
   Strings.prototype.makeM = function() {
+    this.y = 150;
+    this.y2 = 330;
+    this.x = 650;
+    this.x2 = 200;
     new Char({
       context: this.context,
       guitar: this,
       symbol: 'M',
-      xOffset: 28,
-      yOffset: 954
+      xOffset: this.x + 28,
+      yOffset: this.y
     });
     new Char({
       context: this.context,
       guitar: this,
       symbol: 'U',
-      xOffset: 170,
-      yOffset: 954
+      xOffset: this.x + 170,
+      yOffset: this.y
     });
     new Char({
       context: this.context,
       guitar: this,
       symbol: 'S',
-      xOffset: 262,
-      yOffset: 954
+      xOffset: this.x + 262,
+      yOffset: this.y
     });
     new Char({
       context: this.context,
       guitar: this,
       symbol: 'I',
-      xOffset: 352,
-      yOffset: 954
+      xOffset: this.x + 352,
+      yOffset: this.y
     });
     new Char({
       context: this.context,
       guitar: this,
       symbol: 'C',
-      xOffset: 394,
-      yOffset: 954
+      xOffset: this.x + 394,
+      yOffset: this.y
     });
     new Char({
       context: this.context,
       guitar: this,
       symbol: 'T',
-      xOffset: 518,
-      yOffset: 954
+      xOffset: this.x2 + 518,
+      yOffset: this.y2
     });
     new Char({
       context: this.context,
       guitar: this,
       symbol: 'I',
-      xOffset: 620,
-      yOffset: 954
+      xOffset: this.x2 + 620,
+      yOffset: this.y2
     });
     new Char({
       context: this.context,
       guitar: this,
       symbol: 'M',
-      xOffset: 668,
-      yOffset: 954
+      xOffset: this.x2 + 668,
+      yOffset: this.y2
     });
     return new Char({
       context: this.context,
       guitar: this,
       symbol: 'E',
-      xOffset: 808,
-      yOffset: 954
+      xOffset: this.x2 + 808,
+      yOffset: this.y2
     });
   };
 
