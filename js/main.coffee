@@ -31,7 +31,11 @@ class String
 		@defaultColor = "#fff"
 		@makeAudio()
 		@makeBase()
+<<<<<<< HEAD
 		@o.stringsOffset ?=  @o.width*15
+=======
+		@o.stringsOffset ?=  @o.width*25
+>>>>>>> parent of e0d9415... ++
 
 	makeAudio:->
 		@analyser = @o.context.createAnalyser()
@@ -51,7 +55,17 @@ class String
 		@startX 	= 	Math.min @o.offsetX_start, @o.offsetX_end
 		@startY 	= 	Math.min @o.offsetY_start, @o.offsetY_end
 		@endX 	= 	Math.max @o.offsetX_start, @o.offsetX_end
+<<<<<<< HEAD
 		@endtY 	= 	Math.max @o.offsetY_start, @o.offsetY_end
+=======
+		@endY 	= 	Math.max @o.offsetY_start, @o.offsetY_end
+		@middleX 	=  		if (@endX isnt @startX) then parseInt((@endX - @startX)/2) else @endX
+		@middleX_point =  	if (@endX isnt @startX) then @endX - @middleX else @endX
+
+		@middleY 	=  		if (@endY isnt @startY) then parseInt((@endY - @startY)/2) else @endY
+		@middleY_point =  	if (@endY isnt @startY) then @endY - @middleY else @endY
+
+>>>>>>> parent of e0d9415... ++
 		@base.strokeColor = @defaultColor
 		@base.strokeWidth = @o.width
 
@@ -60,15 +74,26 @@ class String
 	change:(e)->
 		point = e.point	
 		@dir = null
+<<<<<<< HEAD
 		if e.delta.x > 0
 			if  ((e.point+e.delta).x >= @startX) and (mouseDown.x < @endX)
 				if ((e.point+e.delta).y >= @startY) and ((e.point+e.delta).y <=@endtY)
+=======
+
+		if e.delta.x > 0
+			if  ((e.point+e.delta).x >= @startX) and (@startX > mouseDown.x)
+				if ((e.point+e.delta).y >= @startY) and ((e.point+e.delta).y <=@endY)
+>>>>>>> parent of e0d9415... ++
 					@touched = true
 					@dir ?= 'x'
 
 		if e.delta.x < 0
 			if  ((e.point-e.delta).x <= @endX) and @startX <  mouseDown.x
+<<<<<<< HEAD
 				if ((e.point+e.delta).y > @startY) and ((e.point+e.delta).y <@endtY)
+=======
+				if ((e.point+e.delta).y > @startY) and ((e.point+e.delta).y <@endY)
+>>>>>>> parent of e0d9415... ++
 					@touched = true
 					@dir ?= 'x'
 		
@@ -87,10 +112,23 @@ class String
 
 		if !@touched then return
 
+<<<<<<< HEAD
 		# if (@base.segments[0].handleOut.y > 200) or ((@base.segments[0].handleOut.x > 200))
 		# 		@animate()
 		# 		return
+=======
+		x_plus = ((point.x  > @middleX_point + @o.stringsOffset) and (e.delta.x > 0))
+		x_minus = ((point.x  < @middleX_point - @o.stringsOffset) and (e.delta.x < 0))
 
+		y_plus = ((point.y  > @middleY_point + @o.stringsOffset) and (e.delta.y > 0))
+		y_minus = ((point.y  < @middleY_point - @o.stringsOffset) and (e.delta.y < 0))
+
+		if x_plus or x_minus or y_plus or y_minus
+				@animate()
+				return
+>>>>>>> parent of e0d9415... ++
+
+		if @anima then return
 
 		if @anima then return
 
@@ -214,12 +252,14 @@ class Char
 	constructor:(o)->
 		@o = o
 		@width = @o.width or 3
+
 		for item, i in text[@o.symbol]
+
 			string = new String
-				offsetX_start: item.offsetX_start 	+ @o.xOffset
-				offsetX_end: 	item.offsetX_end 	+ @o.xOffset
-				offsetY_start: item.offsetY_start 	+ @o.yOffset
-				offsetY_end: 	item.offsetY_end 	+ @o.yOffset
+				offsetX_start: item.offsetX_start
+				offsetX_end: 	item.offsetX_end
+				offsetY_start: item.offsetY_start
+				offsetY_end: 	item.offsetY_end
 				width: @width
 				context: @o.context
 				guitar: @o.guitar
@@ -286,68 +326,6 @@ class Strings
 			context: @context
 			guitar: @
 			symbol: 'M'
-			xOffset: 28
-			yOffset: 954
-
-		new Char
-			context: @context
-			guitar: @
-			symbol: 'U'
-			xOffset: 170
-			yOffset: 954
-
-		new Char
-			context: @context
-			guitar: @
-			symbol: 'S'
-			xOffset: 262
-			yOffset: 954
-
-		new Char
-			context: @context
-			guitar: @
-			symbol: 'I'
-			xOffset: 352
-			yOffset: 954
-
-		new Char
-			context: @context
-			guitar: @
-			symbol: 'C'
-			xOffset: 394
-			yOffset: 954
-
-		# SPACE
-
-		new Char
-			context: @context
-			guitar: @
-			symbol: 'T'
-			xOffset: 518
-			yOffset: 954
-
-		new Char
-			context: @context
-			guitar: @
-			symbol: 'I'
-			xOffset: 620
-			yOffset: 954
-
-		new Char
-			context: @context
-			guitar: @
-			symbol: 'M'
-			xOffset: 668
-			yOffset: 954
-
-		new Char
-			context: @context
-			guitar: @
-			symbol: 'E'
-			xOffset: 808
-			yOffset: 954
-
-
 
 
 	getOffset:(i)->
@@ -441,7 +419,10 @@ onFrame = (e)->
 
 
 onMouseDrag = (e)->
+<<<<<<< HEAD
 	# strings.teardown()
+=======
+>>>>>>> parent of e0d9415... ++
 	strings.changeStrings e
 	strings.mouseMove e
 	mouseDrag = e.point

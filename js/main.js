@@ -43,7 +43,11 @@ String = (function() {
     this.makeAudio();
     this.makeBase();
     if ((_ref = (_base = this.o).stringsOffset) == null) {
+<<<<<<< HEAD
       _base.stringsOffset = this.o.width * 15;
+=======
+      _base.stringsOffset = this.o.width * 25;
+>>>>>>> parent of e0d9415... ++
     }
   }
 
@@ -72,13 +76,22 @@ String = (function() {
   };
 
   String.prototype.change = function(e) {
+<<<<<<< HEAD
     var point, _ref, _ref1, _ref2, _ref3;
+=======
+    var point, x, x_minus, x_plus, y, y_minus, y_plus, _ref, _ref1, _ref2, _ref3;
+>>>>>>> parent of e0d9415... ++
 
     point = e.point;
     this.dir = null;
     if (e.delta.x > 0) {
+<<<<<<< HEAD
       if (((e.point + e.delta).x >= this.startX) && (mouseDown.x < this.endX)) {
         if (((e.point + e.delta).y >= this.startY) && ((e.point + e.delta).y <= this.endtY)) {
+=======
+      if (((e.point + e.delta).x >= this.startX) && (this.startX > mouseDown.x)) {
+        if (((e.point + e.delta).y >= this.startY) && ((e.point + e.delta).y <= this.endY)) {
+>>>>>>> parent of e0d9415... ++
           this.touched = true;
           if ((_ref = this.dir) == null) {
             this.dir = 'x';
@@ -88,7 +101,11 @@ String = (function() {
     }
     if (e.delta.x < 0) {
       if (((e.point - e.delta).x <= this.endX) && this.startX < mouseDown.x) {
+<<<<<<< HEAD
         if (((e.point + e.delta).y > this.startY) && ((e.point + e.delta).y < this.endtY)) {
+=======
+        if (((e.point + e.delta).y > this.startY) && ((e.point + e.delta).y < this.endY)) {
+>>>>>>> parent of e0d9415... ++
           this.touched = true;
           if ((_ref1 = this.dir) == null) {
             this.dir = 'x';
@@ -122,8 +139,18 @@ String = (function() {
     if (this.anima) {
       return;
     }
+<<<<<<< HEAD
     this.base.segments[0].handleOut.y = point.y - this.startY;
     return this.base.segments[0].handleOut.x = point.x - this.startX;
+=======
+    if (this.anima) {
+      return;
+    }
+    x = this.o.offsetX_end < this.o.offsetX_start ? this.endX : this.startX;
+    y = this.o.offsetY_end < this.o.offsetY_start ? this.endY : this.startY;
+    this.base.segments[0].handleOut.y = point.y - y;
+    return this.base.segments[0].handleOut.x = point.x - x;
+>>>>>>> parent of e0d9415... ++
   };
 
   String.prototype.animate = function() {
@@ -273,10 +300,10 @@ Char = (function() {
     for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
       item = _ref[i];
       string = new String({
-        offsetX_start: item.offsetX_start + this.o.xOffset,
-        offsetX_end: item.offsetX_end + this.o.xOffset,
-        offsetY_start: item.offsetY_start + this.o.yOffset,
-        offsetY_end: item.offsetY_end + this.o.yOffset,
+        offsetX_start: item.offsetX_start,
+        offsetX_end: item.offsetX_end,
+        offsetY_start: item.offsetY_start,
+        offsetY_end: item.offsetY_end,
         width: this.width,
         context: this.o.context,
         guitar: this.o.guitar,
@@ -350,68 +377,10 @@ Strings = (function() {
   };
 
   Strings.prototype.makeM = function() {
-    new Char({
-      context: this.context,
-      guitar: this,
-      symbol: 'M',
-      xOffset: 28,
-      yOffset: 954
-    });
-    new Char({
-      context: this.context,
-      guitar: this,
-      symbol: 'U',
-      xOffset: 170,
-      yOffset: 954
-    });
-    new Char({
-      context: this.context,
-      guitar: this,
-      symbol: 'S',
-      xOffset: 262,
-      yOffset: 954
-    });
-    new Char({
-      context: this.context,
-      guitar: this,
-      symbol: 'I',
-      xOffset: 352,
-      yOffset: 954
-    });
-    new Char({
-      context: this.context,
-      guitar: this,
-      symbol: 'C',
-      xOffset: 394,
-      yOffset: 954
-    });
-    new Char({
-      context: this.context,
-      guitar: this,
-      symbol: 'T',
-      xOffset: 518,
-      yOffset: 954
-    });
-    new Char({
-      context: this.context,
-      guitar: this,
-      symbol: 'I',
-      xOffset: 620,
-      yOffset: 954
-    });
-    new Char({
-      context: this.context,
-      guitar: this,
-      symbol: 'M',
-      xOffset: 668,
-      yOffset: 954
-    });
     return new Char({
       context: this.context,
       guitar: this,
-      symbol: 'E',
-      xOffset: 808,
-      yOffset: 954
+      symbol: 'M'
     });
   };
 
