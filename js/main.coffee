@@ -31,7 +31,7 @@ class String
 		@defaultColor = @o.color or "#fff"
 		@makeAudio()
 		@makeBase()
-		@o.stringsOffset ?=  @o.width*25
+		@o.stringsOffset ?=  @o.width*20
 
 	makeAudio:->
 		@analyser = @o.context.createAnalyser()
@@ -52,12 +52,7 @@ class String
 		@startY 	= 	Math.min @o.offsetY_start, @o.offsetY_end
 		@endX 	= 	Math.max @o.offsetX_start, @o.offsetX_end
 		@endY 	= 	Math.max @o.offsetY_start, @o.offsetY_end
-		@middleX 	=  		if (@endX isnt @startX) then parseInt((@endX - @startX)/2) else @endX
-		@middleX_point =  	if (@endX isnt @startX) then @endX - @middleX else @endX
-
-		@middleY 	=  		if (@endY isnt @startY) then parseInt((@endY - @startY)/2) else @endY
-		@middleY_point =  	if (@endY isnt @startY) then @endY - @middleY else @endY
-
+		@middleX 	=  	if @endX isnt @startX then (@endX - @startX)/2 else @endX
 		@base.strokeColor = @defaultColor
 		@base.strokeWidth = @o.width
 
@@ -94,23 +89,18 @@ class String
 
 		if !@touched then return
 
-		x_plus = ((point.x  > @middleX_point + @o.stringsOffset) and (e.delta.x > 0))
-		x_minus = ((point.x  < @middleX_point - @o.stringsOffset) and (e.delta.x < 0))
 
-		y_plus = ((point.y  > @middleY_point + @o.stringsOffset) and (e.delta.y > 0))
-		y_minus = ((point.y  < @middleY_point - @o.stringsOffset) and (e.delta.y < 0))
 
-		if x_plus or x_minus or y_plus or y_minus
+		if (point.x  > @middleX + @o.stringsOffset)
 				@animate()
 				return
 
+
 		if @anima then return
 
-		x = if @o.offsetX_end < @o.offsetX_start then @endX else @startX
-		y = if @o.offsetY_end < @o.offsetY_start then @endY else @startY
 
-		@base.segments[0].handleOut.y = point.y - y
-		@base.segments[0].handleOut.x = point.x - x
+		@base.segments[0].handleOut.y = point.y - @startY
+		@base.segments[0].handleOut.x = point.x - @startX
 
 
 	animate:->
@@ -137,21 +127,19 @@ class String
 		to = 
 			t:1
 
-		@twColor = new TWEEN.Tween(from).to(to, @meter*15)
-		@twColor.easing (t)->
-
-			b = Math.exp(-t*10)*Math.cos(Math.PI*2*t*10)
-			if t >= 1 then return 1
-			1 - b
+		@twColor = new TWEEN.Tween(from).to(to, @meter*6)
 
 		it = @
 		@twColor.onUpdate ->
-			it.base.strokeColor.brightness = @t
+			it.base.strokeColor.brightness -= @t/8
+			if it.base.strokeColor.brightness <= 0.1
+				it.base.strokeColor = it.defaultColor
 
 		@twColor.start()
 
 
 	animateQuake:->
+		console.log  
 		@tw?.stop()
 		@anima = true
 		from = 
@@ -224,6 +212,8 @@ class String
 
 	teardown:->
 		@stopAudio()
+		mouseDown?.x = @endX + 1
+		mouseDown?.y = @endY + 1
 		@base.segments[0].handleOut.x = 0
 		@base.segments[0].handleOut.y = 0
 		@anima = false
@@ -467,17 +457,19 @@ onFrame = (e)->
 
 
 onMouseDrag = (e)->
+	# strings.teardown()
 	strings.changeStrings e
 	strings.mouseMove e
+	mouseDrag = e.point
 
 onMouseDown = (e)->
 	strings.teardown()
+
 	mouseDown = e.point
 
 
 onMouseUp = (e)->
 	strings.makeQuake()
-
 
 
 onMouseMove = (e)->

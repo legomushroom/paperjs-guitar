@@ -43,7 +43,7 @@ String = (function() {
     this.makeAudio();
     this.makeBase();
     if ((_ref = (_base = this.o).stringsOffset) == null) {
-      _base.stringsOffset = this.o.width * 25;
+      _base.stringsOffset = this.o.width * 20;
     }
   }
 
@@ -66,17 +66,14 @@ String = (function() {
     this.startY = Math.min(this.o.offsetY_start, this.o.offsetY_end);
     this.endX = Math.max(this.o.offsetX_start, this.o.offsetX_end);
     this.endY = Math.max(this.o.offsetY_start, this.o.offsetY_end);
-    this.middleX = this.endX !== this.startX ? parseInt((this.endX - this.startX) / 2) : this.endX;
-    this.middleX_point = this.endX !== this.startX ? this.endX - this.middleX : this.endX;
-    this.middleY = this.endY !== this.startY ? parseInt((this.endY - this.startY) / 2) : this.endY;
-    this.middleY_point = this.endY !== this.startY ? this.endY - this.middleY : this.endY;
+    this.middleX = this.endX !== this.startX ? (this.endX - this.startX) / 2 : this.endX;
     this.base.strokeColor = this.defaultColor;
     this.base.strokeWidth = this.o.width;
     return this.height = this.o.offsetY_end - this.o.offsetY_start;
   };
 
   String.prototype.change = function(e) {
-    var point, x, x_minus, x_plus, y, y_minus, y_plus, _ref, _ref1, _ref2, _ref3;
+    var point, _ref, _ref1, _ref2, _ref3;
 
     point = e.point;
     this.dir = null;
@@ -123,21 +120,15 @@ String = (function() {
     if (!this.touched) {
       return;
     }
-    x_plus = (point.x > this.middleX_point + this.o.stringsOffset) && (e.delta.x > 0);
-    x_minus = (point.x < this.middleX_point - this.o.stringsOffset) && (e.delta.x < 0);
-    y_plus = (point.y > this.middleY_point + this.o.stringsOffset) && (e.delta.y > 0);
-    y_minus = (point.y < this.middleY_point - this.o.stringsOffset) && (e.delta.y < 0);
-    if (x_plus || x_minus || y_plus || y_minus) {
+    if (point.x > this.middleX + this.o.stringsOffset) {
       this.animate();
       return;
     }
     if (this.anima) {
       return;
     }
-    x = this.o.offsetX_end < this.o.offsetX_start ? this.endX : this.startX;
-    y = this.o.offsetY_end < this.o.offsetY_start ? this.endY : this.startY;
-    this.base.segments[0].handleOut.y = point.y - y;
-    return this.base.segments[0].handleOut.x = point.x - x;
+    this.base.segments[0].handleOut.y = point.y - this.startY;
+    return this.base.segments[0].handleOut.x = point.x - this.startX;
   };
 
   String.prototype.animate = function() {
@@ -172,19 +163,13 @@ String = (function() {
     to = {
       t: 1
     };
-    this.twColor = new TWEEN.Tween(from).to(to, this.meter * 15);
-    this.twColor.easing(function(t) {
-      var b;
-
-      b = Math.exp(-t * 10) * Math.cos(Math.PI * 2 * t * 10);
-      if (t >= 1) {
-        return 1;
-      }
-      return 1 - b;
-    });
+    this.twColor = new TWEEN.Tween(from).to(to, this.meter * 6);
     it = this;
     this.twColor.onUpdate(function() {
-      return it.base.strokeColor.brightness = this.t;
+      it.base.strokeColor.brightness -= this.t / 8;
+      if (it.base.strokeColor.brightness <= 0.1) {
+        return it.base.strokeColor = it.defaultColor;
+      }
     });
     return this.twColor.start();
   };
@@ -193,6 +178,7 @@ String = (function() {
     var from, it, to, _ref,
       _this = this;
 
+    console.log;
     if ((_ref = this.tw) != null) {
       _ref.stop();
     }
@@ -285,6 +271,12 @@ String = (function() {
 
   String.prototype.teardown = function() {
     this.stopAudio();
+    if (mouseDown != null) {
+      mouseDown.x = this.endX + 1;
+    }
+    if (mouseDown != null) {
+      mouseDown.y = this.endY + 1;
+    }
     this.base.segments[0].handleOut.x = 0;
     this.base.segments[0].handleOut.y = 0;
     this.anima = false;
@@ -567,7 +559,8 @@ onFrame = function(e) {
 
 onMouseDrag = function(e) {
   strings.changeStrings(e);
-  return strings.mouseMove(e);
+  strings.mouseMove(e);
+  return mouseDrag = e.point;
 };
 
 onMouseDown = function(e) {

@@ -47,9 +47,6 @@ body, html
 	.twitter-mask-be
 		position relative
 		z-index 9
-		background: transparent url('../i/twitter.png') no-repeat center center
-		rect 300px
-		display none
 
 	.hover-circle-be
 		rect 50px
@@ -63,9 +60,6 @@ body, html
 			rect 200px
 			top 50px
 			left 50px
-
-			& ~ .twitter-mask-be
-				display block
 
 		&:hover ~ .circle1-be, &:hover ~ .circle2-be, &:hover ~ .circle3-be
 			rect 250px
@@ -102,7 +96,8 @@ body, html
 
 .canvas-e
 	background-color transparent
-	
+	position relative
+	z-index: 10
 
 	&:hover ~ .circle1-be, &:hover ~ .circle2-be, &:hover ~ .circle3-be
 		top 530px
