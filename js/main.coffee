@@ -78,6 +78,9 @@ class Note
 mouseDown = null
 mouseMove = null
 mouseDrag = null
+
+audios = []
+
 class String
 	constructor:(o)->
 		@o = o
@@ -95,13 +98,23 @@ class String
 			size: 34
 
 	makeAudio:->
-		@analyser = @o.context.createAnalyser()
 		@audio = new Audio
 		@audio.controls = true
-		@audio.src = "sounds/#{ @o.guitar.sources[@o.i % @o.guitar.sources.length]}.mp3"
-		@source = @o.context.createMediaElementSource(@audio)
-		@source.connect @analyser
-		@analyser.connect @o.context.destination
+
+		if !audios[@o.i % @o.guitar.sources.length]
+			@audio.src = "sounds/#{ @o.guitar.sources[@o.i % @o.guitar.sources.length]}.mp3"
+			audios.push @audio
+			@source = @o.context.createMediaElementSource(@audio)
+			@source.connect @analyser
+			@analyser = @o.context.createAnalyser()
+			@analyser.connect @o.context.destination
+
+		else 
+			@audio = audios[@o.i % @o.guitar.sources.length]
+		
+
+		
+		# console.log audios
 
 
 	makeBase:->
@@ -130,24 +143,25 @@ class String
 	change:(e)->
 		point = e.point	
 		@a = null
+
 		if e.delta.x > 0
-			if  ((e.point+e.delta).x >= @startX) and (mouseDown.x < @startX)
-				if ((e.point+e.delta).y >= @startY) and ((e.point+e.delta).y <= @endY)
+			if  (e.point.x+e.delta.x >= @startX) and (mouseDown.x < @startX)
+				if (e.point.y+e.delta.y >= @startY) and (e.point.y+e.delta.y <= @endY)
 					@touched = true
 
 		if e.delta.x < 0
-			if  ((e.point-e.delta).x <= @endX) and (mouseDown.x > @endX)
-				if ((e.point+e.delta).y > @startY) and ((e.point+e.delta).y <@endY)
+			if  (e.point.x-e.delta.x <= @endX) and (mouseDown.x > @endX)
+				if (e.point.y+e.delta.y > @startY) and (e.point.y+e.delta.y <@endY)
 					@touched = true
 
 		if e.delta.y < 0
-			if ((e.point+e.delta).y <=@endY) and (@startY <  mouseDown.y)
-				if ((e.point+e.delta).x > @startX) and ((e.point+e.delta).x < @endX)
+			if (e.point.y+e.delta.y <=@endY) and (@startY <  mouseDown.y)
+				if (e.point.x+e.delta.x > @startX) and (e.point.x+e.delta.x < @endX)
 					@touched = true
 
 		if e.delta.y > 0
-			if ((e.point+e.delta).y >= @startY) and (@o.offsetY_end >  mouseDown.y)
-				if ((e.point+e.delta).x > @startX) and ((e.point+e.delta).x < @endX)
+			if (e.point.y+e.delta.y >= @startY) and (@o.offsetY_end >  mouseDown.y)
+				if (e.point.x+e.delta.x > @startX) and (e.point.x+e.delta.x < @endX)
 					@touched = true
 
 		
