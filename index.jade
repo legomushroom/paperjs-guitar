@@ -6,7 +6,6 @@ html
 		link(rel="stylesheet", type="text/css", href="css/main.css")
 	body
 		img(src="i/guitar.png", id="guitar", class="guitar-image-e", alt="")
-		//- img(src="i/text.png", id="text", class="guitar-image-e", alt="")
 
 		canvas(id="myCanvas", class="canvas-e")
 
@@ -23,9 +22,12 @@ html
 		
 		.font-holder-e &nbsp;
 
+		.my-gui-container
+
 		script(type="text/javascript", src="js/lib/jquery-2.0.1.js")
 		script(type="text/javascript", src="js/tween.min.js")
 		script(type="text/javascript", src="js/paper.js")
 		script(type="text/javascript", src="js/data.js")
 		script(type="text/javascript", src="js/dat.gui.min.js")
+		script(type="text/javascript", src="js/jq-events.js")
 		script(type="text/paperscript", src="js/main.js", canvas="myCanvas")

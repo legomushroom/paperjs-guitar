@@ -16,15 +16,15 @@ h =
 	getRand:(min,max)->
 		Math.floor((Math.random() * ((max + 1) - min)) + min)
 
-view.setViewSize $(window).outerWidth(), $(window).outerHeight()
 
-window.Guitar 			= {}
+window.Guitar 			?= {}
+window.Guitar.$window 	= $(window)
 window.Guitar.settings 	= {}
 
 window.Guitar.settings.allowNotes 				= true
 window.Guitar.settings.releaseOnMove 			= true
 window.Guitar.settings.releaseOffsetCoefficient 	= 30
-
+view.setViewSize 1280, 900
 
 class Note
 	constructor:(o)->
@@ -38,7 +38,7 @@ class Note
 		@char = new PointText(@point)
 		@char.justification = 'center'
 		@char.fillColor = @o.color
-		@char.font = 'ToneDeafBB'
+		@char.font = 'ToneDeaf BB'
 		@char.fontSize = @o.size
 		@char.content = @chars[h.getRand(0,@chars.length-1)]
 		@char.opacity = 0
@@ -86,7 +86,7 @@ class String
 		@colors = ["#69D2E7", "#A7DBD8", "#E0E4CC", "#F38630", "#FA6900", "#C02942", "#542437", "#53777A", "#ECD078", "#FE4365"]
 		@defaultColor = @o.color or "#fff"
 		@color = @colors[@o.i % @colors.length]
-		@makeAudio()
+		@o.context and @makeAudio()
 		@makeBase()
 
 		@note = new Note
@@ -130,9 +130,6 @@ class String
 	change:(e)->
 		point = e.point	
 		@a = null
-		if @anima then return
-
-
 		if e.delta.x > 0
 			if  ((e.point+e.delta).x >= @startX) and (mouseDown.x < @startX)
 				if ((e.point+e.delta).y >= @startY) and ((e.point+e.delta).y <= @endY)
@@ -195,7 +192,7 @@ class String
 
 		@animateQuake()
 		@animateColor()
-		@makeSound()
+		@o.context and @makeSound()
 
 	animateColor:->
 		@twColor?.stop()
@@ -310,7 +307,7 @@ class Char
 	constructor:(o)->
 		@o = o
 		@width = @o.width or 3
-		for item, i in text[@o.symbol]
+		for item, i in window.Guitar.text[@o.symbol]
 			string = new String
 				offsetX_start: item.offsetX_start 	+ @o.xOffset
 				offsetX_end: 	item.offsetX_end 	+ @o.xOffset
@@ -333,7 +330,15 @@ class Strings
 		@initialOffset = 300
 		@strings = []
 		@stringWidth = 5
-		@context = new webkitAudioContext()
+		# @context = new webkitAudioContext()
+		contextClass = (window.AudioContext or window.webkitAudioContext or window.mozAudioContext or window.oAudioContext or window.msAudioContext)
+		if contextClass
+		  # Web Audio API is available.
+		  @context = new contextClass()
+		else
+			alert 'Use modern browser to play sounds via Web Audio Api, please'
+			@context = null
+
 		@sources = ['a3', 'b2', 'd3', 'e2', 'g2', 'a2', 'c', 'd2', 'f', 'g1', 'a1', 'b1', 'd1', 'e1']
 
 		@makeStrings()
@@ -522,38 +527,38 @@ class Strings
 		for string, i in @strings
 			string.teardown()
 
-strings = new Strings
 
+
+window.Guitar.strings = new Strings
 
 onFrame = (e)->
 	TWEEN.update()
 
 
 onMouseDrag = (e)->
-
-	strings.changeStrings e
-	strings.mouseMove e
+	window.Guitar.strings.changeStrings e
+	window.Guitar.strings.mouseMove e
 
 onMouseDown = (e)->
-	strings.teardown()
+	window.Guitar.strings.teardown()
 	mouseDown = e.point
 
 
 onMouseUp = (e)->
-	strings.makeQuake()
-
-
+	window.Guitar.strings.makeQuake()
 
 onMouseMove = (e)->
 	mouseMove = e.point
-	strings.mouseMove e
+	window.Guitar.strings.mouseMove e
 
-
-gui = new dat.GUI
+gui = new dat.GUI autoPlace: false
 gui.add window.Guitar.settings, 'allowNotes'
 gui.add window.Guitar.settings, 'releaseOnMove'
 gui.add window.Guitar.settings, 'releaseOffsetCoefficient', 0, 50
 
+$('.my-gui-container').append gui.domElement
 gui.close()
+
+
 
 

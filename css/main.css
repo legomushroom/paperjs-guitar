@@ -12,6 +12,7 @@ html {
   overflow: hidden;
   font-family: monospace;
   background-color: #000;
+  min-height: 900px;
 }
 .twitter-icon-b {
   position: absolute;
@@ -147,10 +148,21 @@ html {
   -o-transition: all 0.5s ease-out;
   transition: all 0.5s ease-out;
 }
+@font-face {
+  font-family: "ToneDeaf BB";
+  src: url("font/ToneDeafBB.eot?") format("eot"), url("font/ToneDeafBB.woff") format("woff"), url("font/ToneDeafBB.ttf") format("truetype"), url("font/ToneDeafBB.svg#ToneDeafBB") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
 .guitar-image-e {
   position: absolute;
   display: none;
 }
 .font-holder-e {
-  font-family: 'ToneDeafBB';
+  font-family: 'ToneDeaf BB';
+}
+.my-gui-container {
+  position: fixed;
+  top: 0;
+  left: 0;
 }

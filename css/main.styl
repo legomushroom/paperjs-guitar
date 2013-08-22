@@ -10,6 +10,7 @@ body, html
 	overflow hidden
 	font-family monospace
 	background-color: black
+	min-height 900px
 
 .twitter-icon-b
 	position:  absolute
@@ -100,7 +101,6 @@ body, html
 
 .canvas-e
 	background-color transparent
-	
 
 	&:hover ~ .circle1-be, &:hover ~ .circle2-be, &:hover ~ .circle3-be
 		top 530px
@@ -134,11 +134,18 @@ body, html
 		     -o-transition: all .5s ease-out;
 		        transition: all .5s ease-out;
 		
+@font-face {font-family:"ToneDeaf BB";src:url("font/ToneDeafBB.eot?") format("eot"),url("font/ToneDeafBB.woff") format("woff"),url("font/ToneDeafBB.ttf") format("truetype"),url("font/ToneDeafBB.svg#ToneDeafBB") format("svg");font-weight:normal;font-style:normal;}
 
 .guitar-image-e
 	position absolute
 	display none
 
 .font-holder-e
-	font-family: 'ToneDeafBB'
+	font-family: 'ToneDeaf BB'
+	
+
+.my-gui-container
+	position fixed
+	top 0 
+	left 0
 
