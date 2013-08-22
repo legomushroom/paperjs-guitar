@@ -18,6 +18,62 @@ h =
 
 view.setViewSize $(window).outerWidth(), $(window).outerHeight()
 
+window.Guitar 			= {}
+window.Guitar.settings 	= {}
+
+window.Guitar.settings.allowNotes 				= true
+window.Guitar.settings.releaseOnMove 			= true
+window.Guitar.settings.releaseOffsetCoefficient 	= 30
+
+
+class Note
+	constructor:(o)->
+		@o = o
+		@point = new Point(@o.point)
+
+		@makeBase()
+
+	makeBase:->
+		@chars =  ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+		@char = new PointText(@point)
+		@char.justification = 'center'
+		@char.fillColor = @o.color
+		@char.font = 'ToneDeafBB'
+		@char.fontSize = @o.size
+		@char.content = @chars[h.getRand(0,@chars.length-1)]
+		@char.opacity = 0
+
+	makeAnimation:->
+		from = 
+			x: @o.point[0]
+			y: @o.point[1]
+		to = 
+			x: @o.point[0] + h.getRand(-40,40)
+			y: - @o.point[1]
+
+		@tw = new TWEEN.Tween(from).to(to, 2000)
+		it = @
+
+		@tw.onStart =>
+			@char.opacity = 1
+		
+		@tw.onUpdate ->
+			it.char.position.x = @x
+			it.char.position.y = @y
+
+		@tw.onComplete =>
+			@teardown()
+
+	animate:->
+		@tw.start()
+
+	teardown:->
+		delete @tw
+		@char.position.x = @o.point[0]
+		@char.position.y = @o.point[1]
+		@makeAnimation()
+		@char.opacity = 0
+
 
 mouseDown = null
 mouseMove = null
@@ -29,9 +85,14 @@ class String
 		@anima 	= false
 		@colors = ["#69D2E7", "#A7DBD8", "#E0E4CC", "#F38630", "#FA6900", "#C02942", "#542437", "#53777A", "#ECD078", "#FE4365"]
 		@defaultColor = @o.color or "#fff"
+		@color = @colors[@o.i % @colors.length]
 		@makeAudio()
 		@makeBase()
-		@o.stringsOffset ?=  @o.width*30
+
+		@note = new Note
+			color: @color
+			point: [@middleX_point, @middleY_point]
+			size: 34
 
 	makeAudio:->
 		@analyser = @o.context.createAnalyser()
@@ -96,15 +157,20 @@ class String
 
 		if !@touched then return
 
-		x_plus = ((point.x  > @middleX_point + @o.stringsOffset) and (e.delta.x > 0))
-		x_minus = ((point.x  < @middleX_point - @o.stringsOffset) and (e.delta.x < 0))
 
-		y_plus = ((point.y  > @middleY_point + @o.stringsOffset) and (e.delta.y > 0))
-		y_minus = ((point.y  < @middleY_point - @o.stringsOffset) and (e.delta.y < 0))
 
-		if (x_plus or x_minus or y_plus or y_minus)
-				@animate()
-				return
+		if window.Guitar.settings.releaseOnMove
+			@o.stringsOffset =  @o.width*window.Guitar.settings.releaseOffsetCoefficient
+
+			x_plus = ((point.x  > @middleX_point + @o.stringsOffset) and (e.delta.x > 0))
+			x_minus = ((point.x  < @middleX_point - @o.stringsOffset) and (e.delta.x < 0))
+
+			y_plus = ((point.y  > @middleY_point + @o.stringsOffset) and (e.delta.y > 0))
+			y_minus = ((point.y  < @middleY_point - @o.stringsOffset) and (e.delta.y < 0))
+
+			if (x_plus or x_minus or y_plus or y_minus)
+					@animate()
+					return
 
 
 		x = if @o.offsetX_end < @o.offsetX_start then @endX else @startX
@@ -119,17 +185,21 @@ class String
 		if @anima then return
 		@anima = true
 
+
 		@soundX = parseInt Math.abs @base.segments[0].handleOut.x
 		@soundY_proto = parseInt Math.abs @base.segments[0].handleOut.y
 		@soundY = @soundY_proto/(@height+(2*@o.width))
 		@meter = Math.max @soundX, @soundY_proto
+
+		if @meter is 0 then return
+
 		@animateQuake()
 		@animateColor()
 		@makeSound()
 
 	animateColor:->
 		@twColor?.stop()
-		@base.strokeColor = @colors[@index % @colors.length]
+		@base.strokeColor = @color
 		@base.strokeColor.saturation = 4
 		from = 
 			t:0
@@ -190,6 +260,8 @@ class String
 	makeSound:->
 		@twSound?.stop()
 
+		window.Guitar.settings.allowNotes and @note.animate()
+
 		from = 
 			c: 2*(@index*25) + @soundX/4
 			t:1
@@ -227,6 +299,7 @@ class String
 		@base.segments[0].handleOut.y = 0
 		@anima = false
 		@touched = false
+		@note.teardown()
 		@base.strokeColor = @defaultColor
 
 
@@ -452,13 +525,6 @@ class Strings
 strings = new Strings
 
 
-class Note
-	constructor:(o)->
-		@o = o
-
-
-new Note
-
 onFrame = (e)->
 	TWEEN.update()
 
@@ -481,4 +547,13 @@ onMouseUp = (e)->
 onMouseMove = (e)->
 	mouseMove = e.point
 	strings.mouseMove e
+
+
+gui = new dat.GUI
+gui.add window.Guitar.settings, 'allowNotes'
+gui.add window.Guitar.settings, 'releaseOnMove'
+gui.add window.Guitar.settings, 'releaseOffsetCoefficient', 0, 50
+
+gui.close()
+
 
