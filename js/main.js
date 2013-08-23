@@ -125,15 +125,15 @@ String = (function() {
   }
 
   String.prototype.makeAudio = function() {
+    this.analyser = this.o.context.createAnalyser();
+    this.analyser.connect(this.o.context.destination);
     this.audio = new Audio;
     this.audio.controls = true;
     if (!audios[this.o.i % this.o.guitar.sources.length]) {
       this.audio.src = "sounds/" + this.o.guitar.sources[this.o.i % this.o.guitar.sources.length] + ".mp3";
       audios.push(this.audio);
       this.source = this.o.context.createMediaElementSource(this.audio);
-      this.source.connect(this.analyser);
-      this.analyser = this.o.context.createAnalyser();
-      return this.analyser.connect(this.o.context.destination);
+      return this.source.connect(this.analyser);
     } else {
       return this.audio = audios[this.o.i % this.o.guitar.sources.length];
     }

@@ -1,6 +1,7 @@
 # 956 = 0
 # 28 = 0
-text = 
+window.Guitar = {}
+window.Guitar.text = 
 
 	'E':[
 		{

@@ -98,6 +98,8 @@ class String
 			size: 34
 
 	makeAudio:->
+		@analyser = @o.context.createAnalyser()
+		@analyser.connect @o.context.destination
 		@audio = new Audio
 		@audio.controls = true
 
@@ -106,8 +108,7 @@ class String
 			audios.push @audio
 			@source = @o.context.createMediaElementSource(@audio)
 			@source.connect @analyser
-			@analyser = @o.context.createAnalyser()
-			@analyser.connect @o.context.destination
+			
 
 		else 
 			@audio = audios[@o.i % @o.guitar.sources.length]
